@@ -102,7 +102,7 @@ public class RecyclerViewAdapterDocs extends RecyclerView.Adapter<RecyclerViewAd
                 page.close();
             }
             renderer.close();
-            fileDescriptor.close();
+            fileDescriptor.close(); //
 
         } catch (Exception e) {
            e.printStackTrace();
