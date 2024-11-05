@@ -13,6 +13,9 @@ import androidx.recyclerview.widget.RecyclerViewAccessibilityDelegate;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -42,7 +45,8 @@ public class classwork extends Fragment {
    FloatingActionMenu fabmenu;
    RecyclerView notesrecyclerview;
    RecyclerViewAdapterNotes notesAdapter;
-   List<Document> documentList;
+    List<String> quizTitleList ;
+
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
@@ -70,6 +74,7 @@ public class classwork extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -77,17 +82,20 @@ public class classwork extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_classwork, container, false);
+
         fabmenu = view.findViewById(R.id.fab_menu);
         assignbtn = view.findViewById(R.id.fab_assignment);
         quizbtn = view.findViewById(R.id.fab_quiz);
         notesbtn = view.findViewById(R.id.fab_notes);
         classCode = getArguments().getString("classcode");
-        documentList = new ArrayList<>();
+        quizTitleList = new ArrayList<>();
         notesrecyclerview =view.findViewById(R.id.notesrecyclerview);
         notesrecyclerview.setHasFixedSize(true);
         notesrecyclerview.setLayoutManager(new LinearLayoutManager(getActivity()));
+        /*addDocument();
+        notesAdapter = new RecyclerViewAdapterNotes(getContext(),documentList);*/
         addDocument();
-        notesAdapter = new RecyclerViewAdapterNotes(getContext(),documentList);
+        notesAdapter = new RecyclerViewAdapterNotes(getContext(),new ArrayList<>());
         notesrecyclerview.setAdapter(notesAdapter);
         notesbtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,16 +107,15 @@ public class classwork extends Fragment {
         assignbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Add functionality for the assign button
-                // Example: startActivity(new Intent(getActivity(), AssignmentActivity.class));
+
             }
         });
 
         quizbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Add functionality for the quiz button
-                // Example: startActivity(new Intent(getActivity(), QuizActivity.class));
+                startActivity(new Intent(getActivity(), CreateQuiz.class)
+                        .putExtra("classcode",classCode));
             }
         });
         return view;
@@ -120,7 +127,7 @@ public class classwork extends Fragment {
         query .addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                documentList.clear();
+                List<Object> documentList = new ArrayList<>();
                 for(DataSnapshot topicSnapshot : snapshot.getChildren()){
 
                         String topicname = topicSnapshot.child("topic").getValue(String.class).toString();
@@ -133,7 +140,7 @@ public class classwork extends Fragment {
                         }
                         documentList.add(new Document(topicname,description,documentURllist));
             }
-            notesAdapter.notifyDataSetChanged();
+            notesAdapter.updateData(documentList);
             }
 
             @Override
@@ -141,7 +148,51 @@ public class classwork extends Fragment {
 
             }
         });
-    }}
+    }
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.classwork_toolbar_menu, menu); // Inflate classwork menu
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (R.id.menu_notes == (item.getItemId())) {
+            Toast.makeText(getContext(), "Notes selected", Toast.LENGTH_SHORT).show();
+            addDocument();
+        } else if (R.id.menu_assignment == (item.getItemId())) {
+            Toast.makeText(getContext(), "Assignment selected", Toast.LENGTH_SHORT).show();
+
+        }else if (R.id.menu_quiz == (item.getItemId())) {
+            Toast.makeText(getContext(), "Quiz selected", Toast.LENGTH_SHORT).show();
+            addQuiz();
+        }
+        return super.onOptionsItemSelected(item);
+
+    }
+    private void addQuiz(){
+        DatabaseReference quizref  =FirebaseDatabase.getInstance().getReference("Quiz");
+        quizTitleList.clear();
+        quizref.child(classCode).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<Object> quiztitle = new ArrayList<>(); // Get existing items
+                for (DataSnapshot quizsnapshot :snapshot.getChildren()){
+                        String title = quizsnapshot.child("title").getValue(String.class);
+                        quiztitle.add(title);
+}
+             notesAdapter.updateData(quiztitle);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getActivity(), "Error fetching quiz data", Toast.LENGTH_SHORT).show();
+            }
+
+        });
+    }
+
+
+}
 
 
 

@@ -2,6 +2,7 @@ package com.example.learnhub;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -36,6 +37,7 @@ public class classroom extends AppCompatActivity {
         String classTitle = intent.getStringExtra("classname");
          classcode = intent.getStringExtra("classcode");
         toolbar.setTitle(classTitle);
+        toolbar.getOverflowIcon().setTint(getResources().getColor(android.R.color.white));
         setSupportActionBar(toolbar);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -52,6 +54,8 @@ public class classroom extends AppCompatActivity {
                 finish();
             }
         });
+
+
         bottomNavigationView = findViewById(R.id.classroombottom);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -85,4 +89,6 @@ public class classroom extends AppCompatActivity {
         fragmentTransaction.replace(R.id.fragment_container,fragment);
         fragmentTransaction.commit();
     }
+
+
 }

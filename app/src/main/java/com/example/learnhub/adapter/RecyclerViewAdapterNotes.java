@@ -21,11 +21,18 @@ import java.util.List;
 
 public class RecyclerViewAdapterNotes extends RecyclerView.Adapter<RecyclerViewAdapterNotes.ViewHolder> {
     Context context;
-    List<Document> documentList;
-    public RecyclerViewAdapterNotes(Context context, List<Document> documentList) {
+    List<Object> itemlist;
+    List<String> quizTitleList;
+    public RecyclerViewAdapterNotes(Context context, List<Object> itemlist) {
         this.context = context;
-        this.documentList = documentList;
+        this.itemlist = itemlist;
     }
+
+    /*public RecyclerViewAdapterNotes( List<String> quizTitleList,Context context) {
+        this.context = context;
+        this.quizTitleList = quizTitleList;
+    }*/
+
     @NonNull
     @Override
     public RecyclerViewAdapterNotes.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -35,14 +42,25 @@ public class RecyclerViewAdapterNotes extends RecyclerView.Adapter<RecyclerViewA
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerViewAdapterNotes.ViewHolder holder, int position) {
-     Document document = documentList.get(position);
-     holder.topic.setText(document.getTopic());
+        Object item  = itemlist.get(position);
+        if (item instanceof Document){
+            Document document = (Document)item;
+            holder.topic.setText(document.getTopic());
+        } else if (item instanceof String) {
+            holder.topic.setText((String)item);
+        }
     }
 
     @Override
     public int getItemCount() {
-        return documentList.size();
+        return itemlist.size();
     }
+    public void  updateData(List<Object> newItemList) {
+        itemlist.clear();
+        itemlist.addAll(newItemList);
+        notifyDataSetChanged();
+    }
+
     public  class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         public TextView topic ;
 
@@ -54,17 +72,21 @@ public class RecyclerViewAdapterNotes extends RecyclerView.Adapter<RecyclerViewA
 
         @Override
         public void onClick(View v) {
-         Document document =  documentList.get(getAdapterPosition());
-         ArrayList<String> documentArrayList = new ArrayList<>();
-         documentArrayList = (ArrayList<String>)document.getDocumentList();
-         Intent intent = new Intent(context, notes.class);
-         intent.putExtra("topic",document.getTopic());
-         intent.putExtra("description",document.getDescription());
-         intent.putStringArrayListExtra("documentList",documentArrayList);
-            Log.d("notesActivity",document.getTopic());
-            Log.d("notesActivity",document.getDescription());
-            Log.d("notesActivity", String.valueOf(document.getDocumentList().size()));
-         context.startActivity(intent);
+            if (itemlist.get(getAdapterPosition()) instanceof Document) {
+                Document document = (Document) itemlist.get(getAdapterPosition());
+                ArrayList<String> documentArrayList = new ArrayList<>();
+                documentArrayList = (ArrayList<String>) document.getDocumentList();
+                Intent intent = new Intent(context, notes.class);
+                intent.putExtra("topic", document.getTopic());
+                intent.putExtra("description", document.getDescription());
+                intent.putStringArrayListExtra("documentList", documentArrayList);
+                Log.d("notesActivity", document.getTopic());
+                Log.d("notesActivity", document.getDescription());
+                Log.d("notesActivity", String.valueOf(document.getDocumentList().size()));
+                context.startActivity(intent);
+            }
         }
     }
+
+
 }

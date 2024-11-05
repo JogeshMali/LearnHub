@@ -16,6 +16,9 @@
         android:theme="@style/Theme.LearnHub"
         tools:targetApi="31">
         <activity
+            android:name=".classroomUi.classwork.CreateQuiz"
+            android:exported="false" />
+        <activity
             android:name=".classroomUi.classwork.notes"
             android:exported="false" />
         <activity
