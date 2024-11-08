@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.example.learnhub.R;
 import com.example.learnhub.adapter.RecyclerViewAdapterNotes;
 import com.example.learnhub.model.Document;
+import com.example.learnhub.model.UserSession;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.material.snackbar.Snackbar;
@@ -46,6 +47,7 @@ public class classwork extends Fragment {
    RecyclerView notesrecyclerview;
    RecyclerViewAdapterNotes notesAdapter;
     List<String> quizTitleList ;
+    String usertype;
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -89,19 +91,22 @@ public class classwork extends Fragment {
         notesbtn = view.findViewById(R.id.fab_notes);
         classCode = getArguments().getString("classcode");
         quizTitleList = new ArrayList<>();
+        UserSession userSession = new UserSession(getContext());
+        usertype = userSession.getUserType();
         notesrecyclerview =view.findViewById(R.id.notesrecyclerview);
         notesrecyclerview.setHasFixedSize(true);
         notesrecyclerview.setLayoutManager(new LinearLayoutManager(getActivity()));
         /*addDocument();
         notesAdapter = new RecyclerViewAdapterNotes(getContext(),documentList);*/
         addDocument();
-        notesAdapter = new RecyclerViewAdapterNotes(getContext(),new ArrayList<>());
+        notesAdapter = new RecyclerViewAdapterNotes(getContext(),new ArrayList<>(),classCode);
         notesrecyclerview.setAdapter(notesAdapter);
+
         notesbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getActivity(), UploadDocument.class)
-                        .putExtra("classcode",classCode));
+                Toast.makeText(getContext(), "Notes selected", Toast.LENGTH_SHORT).show();
+                addDocument();
             }
         });
         assignbtn.setOnClickListener(new View.OnClickListener() {
@@ -114,8 +119,8 @@ public class classwork extends Fragment {
         quizbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getActivity(), CreateQuiz.class)
-                        .putExtra("classcode",classCode));
+                Toast.makeText(getContext(), "Quiz selected", Toast.LENGTH_SHORT).show();
+                addQuiz();
             }
         });
         return view;
@@ -155,16 +160,29 @@ public class classwork extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
     }
 
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (R.id.menu_notes == (item.getItemId())) {
-            Toast.makeText(getContext(), "Notes selected", Toast.LENGTH_SHORT).show();
-            addDocument();
-        } else if (R.id.menu_assignment == (item.getItemId())) {
-            Toast.makeText(getContext(), "Assignment selected", Toast.LENGTH_SHORT).show();
 
-        }else if (R.id.menu_quiz == (item.getItemId())) {
-            Toast.makeText(getContext(), "Quiz selected", Toast.LENGTH_SHORT).show();
-            addQuiz();
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (usertype.equals("Students")) {
+            if (R.id.menu_notes == (item.getItemId())) {
+                Toast.makeText(getContext(), "Notes selected", Toast.LENGTH_SHORT).show();
+                addDocument();
+            } else if (R.id.menu_assignment == (item.getItemId())) {
+                Toast.makeText(getContext(), "Assignment selected", Toast.LENGTH_SHORT).show();
+
+            } else if (R.id.menu_quiz == (item.getItemId())) {
+                Toast.makeText(getContext(), "Quiz selected", Toast.LENGTH_SHORT).show();
+                addQuiz();
+            }
+        }else if (usertype.equals("Faculty")){
+            if (R.id.menu_notes == (item.getItemId())) {
+                startActivity(new Intent(getActivity(), UploadDocument.class)
+                        .putExtra("classcode",classCode));
+            } else if (R.id.menu_assignment == (item.getItemId())) {
+
+            } else if (R.id.menu_quiz == (item.getItemId())) {
+                startActivity(new Intent(getActivity(), CreateQuiz.class)
+                        .putExtra("classcode",classCode));
+            }
         }
         return super.onOptionsItemSelected(item);
 

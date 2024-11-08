@@ -7,14 +7,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.learnhub.R;
+import com.example.learnhub.classroomUi.classwork.ShowQuiz;
+import com.example.learnhub.classroomUi.classwork.ShowQuizResult;
 import com.example.learnhub.classroomUi.classwork.notes;
 import com.example.learnhub.classroomUi.classwork.showDocument;
 import com.example.learnhub.model.Document;
+import com.example.learnhub.model.UserSession;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,9 +27,11 @@ public class RecyclerViewAdapterNotes extends RecyclerView.Adapter<RecyclerViewA
     Context context;
     List<Object> itemlist;
     List<String> quizTitleList;
-    public RecyclerViewAdapterNotes(Context context, List<Object> itemlist) {
+    String classcode;
+    public RecyclerViewAdapterNotes(Context context, List<Object> itemlist,String classcode) {
         this.context = context;
         this.itemlist = itemlist;
+        this.classcode = classcode;
     }
 
     /*public RecyclerViewAdapterNotes( List<String> quizTitleList,Context context) {
@@ -84,6 +90,19 @@ public class RecyclerViewAdapterNotes extends RecyclerView.Adapter<RecyclerViewA
                 Log.d("notesActivity", document.getDescription());
                 Log.d("notesActivity", String.valueOf(document.getDocumentList().size()));
                 context.startActivity(intent);
+            }
+            if (itemlist.get(getAdapterPosition()) instanceof String){
+                Object item  = itemlist.get(getAdapterPosition());
+                UserSession userSession = new UserSession(context);
+                String usertype = userSession.getUserType();
+                if(usertype.equals("Students")) {
+                    context.startActivity(new Intent(context, ShowQuiz.class).putExtra("title", (String) item).putExtra("classcode", classcode));
+                }
+                else {
+                    Toast.makeText(context, "Quiz result", Toast.LENGTH_SHORT).show();
+                    context.startActivity(new Intent(context, ShowQuizResult.class).putExtra("title", (String) item).putExtra("classcode", classcode));
+
+                }
             }
         }
     }

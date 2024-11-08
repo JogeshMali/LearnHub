@@ -19,6 +19,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.learnhub.faculty.Facultyhome;
+import com.example.learnhub.model.UserSession;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -134,6 +135,8 @@ public class Login extends AppCompatActivity {
                         editor.putString("email",email);
                         editor.putString("usertype",usertype);
                         editor.apply();
+                        UserSession userSession = new UserSession(getApplicationContext());
+                        userSession.saveUserType(usertype);
                         Intent intent = new Intent(Login.this, Facultyhome.class);
                         intent.putExtra("username",username);
                         intent.putExtra("email",email);

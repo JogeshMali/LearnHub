@@ -3,7 +3,7 @@ package com.example.learnhub.model;
 import java.util.List;
 
 public class QuizModel {
-    private String quizQuestion,correctAnswer;
+    private String quizQuestion,correctAnswer,userAnswer;
     List<String> options ;
 
     public QuizModel() {
@@ -13,6 +13,7 @@ public class QuizModel {
         this.quizQuestion = quizQuestion;
         this.options = options;
         this.correctAnswer = correctAnswer;
+        this.userAnswer = "";
     }
 
 
@@ -39,5 +40,13 @@ public class QuizModel {
 
     public void setOptions(List<String> options) {
         this.options = options;
+    }
+
+    public String getUserAnswer() {
+        return userAnswer;
+    }
+
+    public void setUserAnswer(String userAnswer) {
+        this.userAnswer = userAnswer;
     }
 }

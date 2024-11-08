@@ -19,6 +19,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.learnhub.faculty.Faculty;
 import com.example.learnhub.faculty.Facultyhome;
+import com.example.learnhub.model.UserSession;
 import com.example.learnhub.student.Students;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -75,7 +76,8 @@ public class SignUp extends AppCompatActivity {
                         CreateAccount("Faculty",userId,obj,email,password);
 
                     }
-                        Intent intent = new Intent(SignUp.this, Facultyhome.class);
+                        UserSession userSession = new UserSession(getApplicationContext());
+                        userSession.saveUserType(profession);                        Intent intent = new Intent(SignUp.this, Facultyhome.class);
 
                         intent.putExtra("username",username);
                         intent.putExtra("email",email);

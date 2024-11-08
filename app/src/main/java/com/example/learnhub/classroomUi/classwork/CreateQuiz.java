@@ -27,12 +27,12 @@ import java.util.List;
 
 public class CreateQuiz extends AppCompatActivity {
 
-    EditText quizTitle , quizQuestion ,correctAnswer;
+    EditText quizTitle , quizQuestion ,correctAnswer,score;
     EditText opt1,opt2,opt3,opt4;
     Button addQuestionbtn , submitbtn;
     List<String> options ;
     List<QuizModel> quizModelList;
-    String title , question  ,correctans,classcode;
+    String title , question  ,correctans,classcode,totalScore;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +48,7 @@ public class CreateQuiz extends AppCompatActivity {
         quizTitle  =findViewById(R.id.quiz_title);
         quizQuestion =findViewById(R.id.question_text);
         correctAnswer =findViewById(R.id.correct_answer);
+        score  =findViewById(R.id.total_score_input);
         opt1 =findViewById(R.id.option1);
         opt2 =findViewById(R.id.option2);
         opt3 =findViewById(R.id.option3);
@@ -71,6 +72,7 @@ public class CreateQuiz extends AppCompatActivity {
 
             String quizId = quizRef.push().getKey();
             quizRef.child(classcode).child(quizId).child("title").setValue(title);
+            quizRef.child(classcode).child(quizId).child("score").setValue(totalScore);
             for (QuizModel question : quizModelList){
                  String questionId = quizRef.child(classcode).child(quizId).child(title).push().getKey();
                  quizRef.child(classcode).child(quizId).child(title).child(questionId).setValue(question);
@@ -101,6 +103,8 @@ public class CreateQuiz extends AppCompatActivity {
         options.add(opt3.getText().toString());
         options.add(opt4.getText().toString());
         correctans = correctAnswer.getText().toString().trim();
+        totalScore = score.getText().toString().trim();
+
     }
     private void clearFields() {
         quizQuestion.setText("");
