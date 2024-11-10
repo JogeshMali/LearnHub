@@ -137,6 +137,17 @@ public class Facultyhome extends AppCompatActivity {
                     logoutUser();
                     return true;
                 }
+                if (item.getItemId() == R.id.nav_home){
+                    navController.navigate(R.id.nav_home);
+                    drawer.closeDrawer(GravityCompat.START);
+                    return true;
+
+                }
+                if (item.getItemId() == R.id.nav_notification){
+                    navController.navigate(R.id.nav_login);
+                    drawer.closeDrawer(GravityCompat.START);
+                    return true;
+                }
                 drawer.closeDrawer(GravityCompat.START);
                 return true;
             }

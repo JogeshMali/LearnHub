@@ -16,6 +16,18 @@
         android:theme="@style/Theme.LearnHub"
         tools:targetApi="31">
         <activity
+            android:name=".classroomUi.classwork.ShowStudentAssignment"
+            android:exported="false" />
+        <activity
+            android:name=".classroomUi.classwork.ShowAssignmentResult"
+            android:exported="false" />
+        <activity
+            android:name=".classroomUi.classwork.ShowAssignment"
+            android:exported="false" />
+        <activity
+            android:name=".classroomUi.classwork.CreateAssignment"
+            android:exported="false" />
+        <activity
             android:name=".classroomUi.classwork.UserQuizResult"
             android:exported="false" />
         <activity

@@ -2,6 +2,7 @@ package com.example.learnhub.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,10 +14,13 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.learnhub.R;
+import com.example.learnhub.classroomUi.classwork.ShowAssignment;
+import com.example.learnhub.classroomUi.classwork.ShowAssignmentResult;
 import com.example.learnhub.classroomUi.classwork.ShowQuiz;
 import com.example.learnhub.classroomUi.classwork.ShowQuizResult;
 import com.example.learnhub.classroomUi.classwork.notes;
 import com.example.learnhub.classroomUi.classwork.showDocument;
+import com.example.learnhub.model.AssignmentModel;
 import com.example.learnhub.model.Document;
 import com.example.learnhub.model.UserSession;
 
@@ -54,6 +58,9 @@ public class RecyclerViewAdapterNotes extends RecyclerView.Adapter<RecyclerViewA
             holder.topic.setText(document.getTopic());
         } else if (item instanceof String) {
             holder.topic.setText((String)item);
+        } else if (item instanceof AssignmentModel) {
+            AssignmentModel assignment = (AssignmentModel) item;
+            holder.topic.setText(assignment.getAssignTitle());
         }
     }
 
@@ -91,6 +98,21 @@ public class RecyclerViewAdapterNotes extends RecyclerView.Adapter<RecyclerViewA
                 Log.d("notesActivity", String.valueOf(document.getDocumentList().size()));
                 context.startActivity(intent);
             }
+            if (itemlist.get(getAdapterPosition()) instanceof AssignmentModel){
+                AssignmentModel assignmentModel  =(AssignmentModel) itemlist.get(getAdapterPosition());
+                UserSession userSession = new UserSession(context);
+                String title = assignmentModel.getAssignTitle();
+                String usertype = userSession.getUserType();
+
+                if (usertype.equals("Students")) {
+                    context.startActivity(new Intent(context, ShowAssignment.class)
+                            .putExtra("title", title).putExtra("classcode", classcode)
+                    );
+                }else{
+                    context.startActivity(new Intent(context, ShowAssignmentResult.class)
+                            .putExtra("title", title).putExtra("classcode", classcode));
+                }
+            }
             if (itemlist.get(getAdapterPosition()) instanceof String){
                 Object item  = itemlist.get(getAdapterPosition());
                 UserSession userSession = new UserSession(context);
@@ -104,6 +126,9 @@ public class RecyclerViewAdapterNotes extends RecyclerView.Adapter<RecyclerViewA
 
                 }
             }
+
+
+
         }
     }
 

@@ -30,7 +30,7 @@ import java.util.List;
 
 public class ShowQuizResult extends AppCompatActivity {
    RecyclerView quizResultRecyclerView;
-   List<QuizResultModel> quizResultList;
+   List<Object> quizResultList;
    RecyclerViewAdapterQuizResult quizResultAdapter;
    String classcode,title,score,username;
 
@@ -82,11 +82,11 @@ public class ShowQuizResult extends AppCompatActivity {
                         DataSnapshot scoreSnapshot = usernameSnapshot.child("Score");
                         if (scoreSnapshot.exists()) {
                             // Retrieve score value from "Score" node
-                            Integer score = scoreSnapshot.child("score").getValue(Integer.class);
+                            float score = scoreSnapshot.child("score").getValue(Float.class);
                             Log.d("fetchQuizResult", "Score for " + username + ": " + score);
 
                             // Add the username and score to the result list
-                            quizResultList.add(new QuizResultModel(username, score != null ? String.valueOf(score) : "N/A"));
+                            quizResultList.add(new QuizResultModel(username,  String.valueOf(score)));
                         } else {
                             Log.d("fetchQuizResult", "Score not found for username: " + username);
                         }

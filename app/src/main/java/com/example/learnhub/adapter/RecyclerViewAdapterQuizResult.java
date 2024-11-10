@@ -1,24 +1,31 @@
 package com.example.learnhub.adapter;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.learnhub.R;
+import com.example.learnhub.classroomUi.classwork.ShowStudentAssignment;
+import com.example.learnhub.model.AssignmentResultModel;
 import com.example.learnhub.model.QuizResultModel;
 
 import java.util.List;
 
 public class RecyclerViewAdapterQuizResult extends RecyclerView.Adapter<RecyclerViewAdapterQuizResult.ViewHolder> {
     private Context context;
-    private List<QuizResultModel> quizResultModelList;
+    private List<Object> quizResultModelList;
 
-    public RecyclerViewAdapterQuizResult(Context context, List<QuizResultModel> quizResultModelList) {
+
+    public RecyclerViewAdapterQuizResult(Context context, List<Object> quizResultModelList) {
         this.context = context;
         this.quizResultModelList = quizResultModelList;
     }
@@ -32,16 +39,23 @@ public class RecyclerViewAdapterQuizResult extends RecyclerView.Adapter<Recycler
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerViewAdapterQuizResult.ViewHolder holder, int position) {
-      QuizResultModel quizResultModel = quizResultModelList.get(position);
-      holder.qname.setText(quizResultModel.getUsername());
-      holder.score.setText(quizResultModel.getScore());
+        if (quizResultModelList.get(position) instanceof QuizResultModel) {
+            QuizResultModel quizResultModel = (QuizResultModel) quizResultModelList.get(position);
+            holder.qname.setText(quizResultModel.getUsername());
+            holder.score.setText(quizResultModel.getScore());
+        }
+        else if(quizResultModelList.get(position) instanceof AssignmentResultModel){
+            AssignmentResultModel assignmentResultModel  =(AssignmentResultModel) quizResultModelList.get(position);
+            holder.qname.setText(assignmentResultModel.getUsername());
+            holder.score.setText(assignmentResultModel.getSubmissionStatus());
+        }
     }
 
     @Override
     public int getItemCount() {
         return quizResultModelList.size();
     }
-    public void updateData(List<QuizResultModel> newQuizResultModelList) {
+    public void updateData(List<Object> newQuizResultModelList) {
         this.quizResultModelList = newQuizResultModelList;
         notifyDataSetChanged();
     }
@@ -57,7 +71,25 @@ public class RecyclerViewAdapterQuizResult extends RecyclerView.Adapter<Recycler
 
         @Override
         public void onClick(View v) {
+            int position = getAdapterPosition();
+            if (position != RecyclerView.NO_POSITION) {
+                if (quizResultModelList.get(position) instanceof AssignmentResultModel) {
+                    AssignmentResultModel assignmentResultModel = (AssignmentResultModel) quizResultModelList.get(position);
+                    Toast.makeText(context, "Assignment Selected", Toast.LENGTH_SHORT).show();
+                    String uid = assignmentResultModel.getUid();
+                    String username = assignmentResultModel.getUsername();
+                    Log.d("UID", "Adapter uid: " + uid);
+                    Log.d("UID", "USername uid: " + username);
+                    // Use itemView.getContext() for starting the intent
+                    Intent intent = new Intent(itemView.getContext(), ShowStudentAssignment.class);
+                    intent.putExtra("username", username);
+                    intent.putExtra("uid", uid);
+                    itemView.getContext().startActivity(intent);
+                    Log.e("UID", "Context is not an instance of Activity");
+                    }
 
+                }
+            }
         }
     }
-}
+

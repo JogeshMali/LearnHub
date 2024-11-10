@@ -40,7 +40,8 @@ public class ShowQuiz extends AppCompatActivity {
      List<QuizModel> quizList;
      List<String> answerList;
      String classcode , Title;
-     int totalScore = 0 , totalQuestion= 0 ,userScore = 0 ;
+     int totalScore = 0 , totalQuestion= 0 ;
+     float userScore = 0 ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,9 +62,14 @@ public class ShowQuiz extends AppCompatActivity {
      Intent intent = getIntent();
      classcode = intent.getStringExtra("classcode").trim();
      Title = intent.getStringExtra("title").trim();
-     fetchQuizData();
      quizTitle.setText(Title);
-     quizRecyclerview.setHasFixedSize(true);
+
+        fetchQuizData(() -> {
+            // Once data is loaded, check submission status
+            checkQuizSubmissionStatus();
+        });
+
+        quizRecyclerview.setHasFixedSize(true);
      quizRecyclerview.setLayoutManager(new LinearLayoutManager(this));
      quizAdpter = new RecyclerViewAdapterQuiz(getApplication(),quizList);
      quizRecyclerview.setAdapter(quizAdpter);
@@ -80,7 +86,7 @@ public class ShowQuiz extends AppCompatActivity {
 
 
 
-    private void fetchQuizData() {
+    private void fetchQuizData(Runnable callback) {
         DatabaseReference quizRef = FirebaseDatabase.getInstance().getReference("Quiz")
                 .child(classcode)
                 ; // Querying based on the classCode (e.g., "classcode123")
@@ -115,6 +121,10 @@ public class ShowQuiz extends AppCompatActivity {
                             QuizModel quiz = new QuizModel(quizQuestion, options, correctAnswer);
                             quizList.add(quiz);
                             totalQuestion++;
+                            if (callback != null) callback.run();
+                           else {
+                            Log.e("ShowQuiz", "No quizzes found for classCode: " + classcode);
+                            }
                         }
                     }
 
@@ -137,13 +147,13 @@ public class ShowQuiz extends AppCompatActivity {
 
     private void calculateScore() {
         userScore = 0;
-        float ScorePerQuestion = totalScore / totalQuestion;
+        float ScorePerQuestion = (float)totalScore / totalQuestion;
         Log.d("ShowQuiz","scoreperques" + ScorePerQuestion);
 
         for (QuizModel quiz : quizList) {
             String userAnswer = quiz.getUserAnswer();
             String correctAnswer = quiz.getCorrectAnswer();
-            answerList.add(correctAnswer);
+            answerList.add(userAnswer);
             // Log answers for debugging
             Log.d("ShowQuiz", "User Answer: " + userAnswer);
             Log.d("ShowQuiz", "Correct Answer: " + correctAnswer);

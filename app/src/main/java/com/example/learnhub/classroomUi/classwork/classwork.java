@@ -22,11 +22,13 @@ import android.widget.Toast;
 
 import com.example.learnhub.R;
 import com.example.learnhub.adapter.RecyclerViewAdapterNotes;
+import com.example.learnhub.model.AssignmentModel;
 import com.example.learnhub.model.Document;
 import com.example.learnhub.model.UserSession;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -112,7 +114,8 @@ public class classwork extends Fragment {
         assignbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Toast.makeText(getContext(), "Assignment Selected", Toast.LENGTH_SHORT).show();
+                addAssignment();
             }
         });
 
@@ -168,7 +171,7 @@ public class classwork extends Fragment {
                 addDocument();
             } else if (R.id.menu_assignment == (item.getItemId())) {
                 Toast.makeText(getContext(), "Assignment selected", Toast.LENGTH_SHORT).show();
-
+                addAssignment();
             } else if (R.id.menu_quiz == (item.getItemId())) {
                 Toast.makeText(getContext(), "Quiz selected", Toast.LENGTH_SHORT).show();
                 addQuiz();
@@ -178,7 +181,8 @@ public class classwork extends Fragment {
                 startActivity(new Intent(getActivity(), UploadDocument.class)
                         .putExtra("classcode",classCode));
             } else if (R.id.menu_assignment == (item.getItemId())) {
-
+                startActivity(new Intent(getActivity(), CreateAssignment.class)
+                        .putExtra("classcode",classCode));
             } else if (R.id.menu_quiz == (item.getItemId())) {
                 startActivity(new Intent(getActivity(), CreateQuiz.class)
                         .putExtra("classcode",classCode));
@@ -206,6 +210,31 @@ public class classwork extends Fragment {
                 Toast.makeText(getActivity(), "Error fetching quiz data", Toast.LENGTH_SHORT).show();
             }
 
+        });
+    }
+
+    private void addAssignment() {
+        List<Object> assignTitleList = new ArrayList<>();
+        DatabaseReference asignRef = FirebaseDatabase.getInstance().getReference("AssignmentModel").child(classCode);
+        asignRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                assignTitleList.clear();
+                for (DataSnapshot useridsnapshot : snapshot.getChildren()) {
+                    for (DataSnapshot usernameSnapshot : useridsnapshot.getChildren()) {
+                        String title = usernameSnapshot.child("assignTitle").getValue(String.class);
+                        if (title != null) {
+                            assignTitleList.add(new AssignmentModel(title));
+                        }
+                    }
+                }
+                notesAdapter.updateData(assignTitleList);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getActivity(), "Error fetching assignment data", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 

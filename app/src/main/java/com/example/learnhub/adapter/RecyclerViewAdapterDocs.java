@@ -54,7 +54,7 @@ public class RecyclerViewAdapterDocs extends RecyclerView.Adapter<RecyclerViewAd
           Glide.with(context).load(pdfThumbNail).into(holder.fileimg);
       }else if (isImage(uri)){
           Glide.with(context)
-                  .load(documentModel.getFileURI())
+                  .load(uri)
                   .into(holder.fileimg);
       }else {
       }
@@ -62,10 +62,11 @@ public class RecyclerViewAdapterDocs extends RecyclerView.Adapter<RecyclerViewAd
 
       holder.itemView.setOnClickListener(v -> {
           Intent intent = new Intent(Intent.ACTION_VIEW);
-          intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-          if (intent.resolveActivity(context.getPackageManager())!=null){
+          intent.setDataAndType(uri, getMimeType(uri));
+          intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+          if (intent.resolveActivity(context.getPackageManager()) != null) {
               context.startActivity(intent);
-          }else {
+          } else {
               Toast.makeText(context, "No application available to open this document.", Toast.LENGTH_SHORT).show();
           }
       });
