@@ -16,6 +16,13 @@
         android:id="@+id/menu_quiz"
         android:orderInCategory="100"
         android:title="Quiz"
-        app:showAsAction="never" />
+        app:showAsAction="never"
+        />
+    <item
+        android:id="@+id/menu_attendance"
+        android:orderInCategory="100"
+        android:title="Attendance"
+        app:showAsAction="never"
+        />
 
 </menu>

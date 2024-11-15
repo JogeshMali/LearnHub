@@ -1,7 +1,10 @@
 package com.example.learnhub.faculty;
 
 import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -38,6 +41,12 @@ public class Classes extends AppCompatActivity {
         setContentView(R.layout.activity_classes);
         toolbar = findViewById(R.id.toolbar1);
         setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            Drawable upArrow = getResources().getDrawable(R.drawable.backbtn); // Default back icon for AppCompat
+            upArrow.setColorFilter(getResources().getColor(android.R.color.white), PorterDuff.Mode.SRC_ATOP);
+            getSupportActionBar().setHomeAsUpIndicator(upArrow);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
         Objects.requireNonNull(getSupportActionBar()).setTitle("Class settings"); // Add this line if you want to set a title
 
 
@@ -63,13 +72,13 @@ public class Classes extends AppCompatActivity {
                 classcode.setText(generatecode());
             }
         });
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+        /*toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Classes.this, Facultyhome.class);
                 startActivity(intent);
             }
-        });
+        });*/
         createbtn=findViewById(R.id.createbtn);
         createbtn.setOnClickListener(new View.OnClickListener() {
 
@@ -93,6 +102,14 @@ public class Classes extends AppCompatActivity {
             }
         });
 
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
     private String generatecode(){
         String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";

@@ -56,6 +56,16 @@
             fab:fab_label="Notes"
             fab:fab_showShadow="true"
             fab:fab_size="mini" />
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fab_attendance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/assignment"
+            fab:fab_colorNormal="@color/toolbarcolor"
+            fab:fab_colorPressed="@color/blueshade"
+            fab:fab_label="Attendance"
+            fab:fab_showShadow="true"
+            fab:fab_size="mini" />
     </com.github.clans.fab.FloatingActionMenu>
 
 </FrameLayout>

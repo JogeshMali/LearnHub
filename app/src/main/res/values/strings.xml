@@ -17,7 +17,7 @@
     <string name="menu_notification">Notification</string>
     <string name="menu_login">Login</string>
     <string name="menu_logout">Logout</string>
-    <string name="menu_help">Help</string>
+    <string name="menu_help">About us </string>
     <string name="title_activity_classroom">classroom</string>
     <string name="title_chat">Chatroom</string>
     <string name="title_classwork">Classwork</string>

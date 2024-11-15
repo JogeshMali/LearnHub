@@ -1,7 +1,10 @@
 package com.example.learnhub;
 
 import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,12 +23,13 @@ import androidx.fragment.app.FragmentTransaction;
 import com.example.learnhub.classroomUi.chatroom.chatroom;
 import com.example.learnhub.classroomUi.classwork.classwork;
 import com.example.learnhub.faculty.ui.home.HomeFragment;
+import com.example.learnhub.model.UserSession;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class classroom extends AppCompatActivity {
     BottomNavigationView bottomNavigationView;
     Toolbar toolbar ;
-    String classcode;
+    String classcode,classTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,11 +38,20 @@ public class classroom extends AppCompatActivity {
         setContentView(R.layout.activity_classroom);
         toolbar = findViewById(R.id.toolbar3);
         Intent intent = getIntent();
-        String classTitle = intent.getStringExtra("classname");
+         classTitle = intent.getStringExtra("classname");
          classcode = intent.getStringExtra("classcode");
-        toolbar.setTitle(classTitle);
+        /*toolbar.setTitle(classTitle);*/
         toolbar.getOverflowIcon().setTint(getResources().getColor(android.R.color.white));
         setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            Drawable upArrow = getResources().getDrawable(R.drawable.backbtn); // Default back icon for AppCompat
+            upArrow.setColorFilter(getResources().getColor(android.R.color.white), PorterDuff.Mode.SRC_ATOP);
+            getSupportActionBar().setHomeAsUpIndicator(upArrow);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setTitle(classTitle);
+        }
+
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -47,13 +60,13 @@ public class classroom extends AppCompatActivity {
         if (savedInstanceState == null) {
             loadFragment(new chatroom()); // Load default fragment (chatroom)
         }
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+        /*toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(classroom.this,HomeFragment.class));
                 finish();
             }
-        });
+        });*/
 
 
         bottomNavigationView = findViewById(R.id.classroombottom);
@@ -81,10 +94,23 @@ public class classroom extends AppCompatActivity {
 
 
     }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
     private  void  loadFragment(Fragment fragment){
         FragmentTransaction fragmentTransaction  =getSupportFragmentManager().beginTransaction();
         Bundle args = new Bundle();
         args.putString("classcode",classcode);
+        args.putString("classname",classTitle);
+        UserSession userSession=new UserSession(getApplicationContext());
+        userSession.saveClassCode(classcode);
         fragment.setArguments(args);
         fragmentTransaction.replace(R.id.fragment_container,fragment);
         fragmentTransaction.commit();

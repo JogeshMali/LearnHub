@@ -17,8 +17,10 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.learnhub.R;
 import com.example.learnhub.adapter.RecyclerViewAdapterDocs;
+import com.example.learnhub.model.NotificationModel;
 import com.example.learnhub.model.QuizModel;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -76,8 +78,10 @@ public class CreateQuiz extends AppCompatActivity {
             for (QuizModel question : quizModelList){
                  String questionId = quizRef.child(classcode).child(quizId).child(title).push().getKey();
                  quizRef.child(classcode).child(quizId).child(title).child(questionId).setValue(question);
-        }
-                    Toast.makeText(CreateQuiz.this, "Quiz created successfully", Toast.LENGTH_SHORT).show();
+            }
+            String username = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+            NotificationModel.NotificationUtils.sendNotification(getApplicationContext(),title,"Uploaded the Quiz",username,classcode);
+            Toast.makeText(CreateQuiz.this, "Quiz created successfully", Toast.LENGTH_SHORT).show();
                     quizModelList.clear();
                     options.clear();
 

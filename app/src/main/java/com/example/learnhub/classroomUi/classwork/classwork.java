@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.example.learnhub.R;
 import com.example.learnhub.adapter.RecyclerViewAdapterNotes;
 import com.example.learnhub.model.AssignmentModel;
+import com.example.learnhub.model.AttendanceModel;
 import com.example.learnhub.model.Document;
 import com.example.learnhub.model.UserSession;
 import com.github.clans.fab.FloatingActionButton;
@@ -44,7 +45,7 @@ import java.util.Map;
 
 public class classwork extends Fragment {
 
-   FloatingActionButton assignbtn,quizbtn,notesbtn;
+   FloatingActionButton assignbtn,quizbtn,notesbtn,attenbtn;
    FloatingActionMenu fabmenu;
    RecyclerView notesrecyclerview;
    RecyclerViewAdapterNotes notesAdapter;
@@ -91,6 +92,7 @@ public class classwork extends Fragment {
         assignbtn = view.findViewById(R.id.fab_assignment);
         quizbtn = view.findViewById(R.id.fab_quiz);
         notesbtn = view.findViewById(R.id.fab_notes);
+        attenbtn = view.findViewById(R.id.fab_attendance);
         classCode = getArguments().getString("classcode");
         quizTitleList = new ArrayList<>();
         UserSession userSession = new UserSession(getContext());
@@ -124,6 +126,13 @@ public class classwork extends Fragment {
             public void onClick(View v) {
                 Toast.makeText(getContext(), "Quiz selected", Toast.LENGTH_SHORT).show();
                 addQuiz();
+            }
+        });
+        attenbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), "Attendance selected", Toast.LENGTH_SHORT).show();
+                addAttendance();
             }
         });
         return view;
@@ -175,6 +184,9 @@ public class classwork extends Fragment {
             } else if (R.id.menu_quiz == (item.getItemId())) {
                 Toast.makeText(getContext(), "Quiz selected", Toast.LENGTH_SHORT).show();
                 addQuiz();
+            } else if (R.id.menu_attendance == (item.getItemId())) {
+                Toast.makeText(getContext(), "Attendance selected", Toast.LENGTH_SHORT).show();
+                addAttendance();
             }
         }else if (usertype.equals("Faculty")){
             if (R.id.menu_notes == (item.getItemId())) {
@@ -185,6 +197,9 @@ public class classwork extends Fragment {
                         .putExtra("classcode",classCode));
             } else if (R.id.menu_quiz == (item.getItemId())) {
                 startActivity(new Intent(getActivity(), CreateQuiz.class)
+                        .putExtra("classcode",classCode));
+            } else if (R.id.menu_attendance == (item.getItemId())) {
+                startActivity(new Intent(getActivity(), CreateAttendance.class)
                         .putExtra("classcode",classCode));
             }
         }
@@ -234,6 +249,30 @@ public class classwork extends Fragment {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Toast.makeText(getActivity(), "Error fetching assignment data", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private  void addAttendance(){
+        List<Object> attendanceList = new ArrayList<>();
+        DatabaseReference attenRef = FirebaseDatabase.getInstance().getReference("Attendance").child(classCode);
+        attenRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot idSnapshot : snapshot.getChildren()){
+                    String title = idSnapshot.child("attentitle").getValue(String.class);
+                    String date = idSnapshot.child("date").getValue(String.class);
+                    boolean open = idSnapshot.child("open").getValue(Boolean.class);
+                    long timeLimit = idSnapshot.child("timeLimit").getValue(Long.class);
+                    long startTime = idSnapshot.child("startTime").getValue(Long.class);
+                    attendanceList.add(new AttendanceModel(title,date,timeLimit,startTime,open));
+                }
+                notesAdapter.updateData(attendanceList);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
             }
         });
     }

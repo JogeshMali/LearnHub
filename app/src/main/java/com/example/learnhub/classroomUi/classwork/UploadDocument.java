@@ -2,9 +2,12 @@ package com.example.learnhub.classroomUi.classwork;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -27,12 +30,14 @@ import com.example.learnhub.R;
 import com.example.learnhub.adapter.RecyclerViewAdapterDocs;
 import com.example.learnhub.model.Document;
 import com.example.learnhub.model.DocumentModel;
+import com.example.learnhub.model.NotificationModel;
 import com.google.android.flexbox.FlexDirection;
 import com.google.android.flexbox.FlexboxLayoutManager;
 import com.google.android.flexbox.JustifyContent;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -70,13 +75,20 @@ public class UploadDocument extends AppCompatActivity {
         });
         toolbar  = findViewById(R.id.toolbar2);
         setSupportActionBar(toolbar);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+        if (getSupportActionBar() != null) {
+            Drawable upArrow = getResources().getDrawable(R.drawable.backbtn); // Default back icon for AppCompat
+            upArrow.setColorFilter(getResources().getColor(android.R.color.white), PorterDuff.Mode.SRC_ATOP);
+            getSupportActionBar().setHomeAsUpIndicator(upArrow);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+        /*toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(UploadDocument.this, classwork.class));
                 finish();
             }
-        });
+        });*/
+
         topic = findViewById(R.id.topic);
         description= findViewById(R.id.notesDescription);
         uploadbtn = findViewById(R.id.uploadbtn);
@@ -102,6 +114,14 @@ public class UploadDocument extends AppCompatActivity {
         attachfile.setOnClickListener(v -> {openDocumentPicker();});
 
         uploadbtn.setOnClickListener(v -> {StoredDocumentInFirebase(documentList);});
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
    
     private void openDocumentPicker() {
@@ -165,7 +185,9 @@ public class UploadDocument extends AppCompatActivity {
                                @Override
                                public void onComplete(@NonNull Task<Void> task) {
                                    if (task.isSuccessful()) {
+                                       String username = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
                                        Toast.makeText(UploadDocument.this, "Document Added Successfully", Toast.LENGTH_SHORT).show();
+                                       NotificationModel.NotificationUtils.sendNotification(getApplicationContext(),ntopic,"Uploaded the Notes",username,classcode);
                                        startActivity(new Intent(UploadDocument.this, classwork.class));
                                    }else
                                        Toast.makeText(UploadDocument.this, "Error while adding documents", Toast.LENGTH_SHORT).show();

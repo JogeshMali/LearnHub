@@ -24,6 +24,9 @@ import com.example.learnhub.adapter.RecyclerViewAdapterStd;
 import com.example.learnhub.databinding.FragmentHomeBinding;
 import com.example.learnhub.faculty.Classes;
 import com.example.learnhub.student.JoinClass;
+import com.google.android.flexbox.FlexDirection;
+import com.google.android.flexbox.FlexboxLayoutManager;
+import com.google.android.flexbox.JustifyContent;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -87,6 +90,9 @@ public class HomeFragment extends Fragment {
                         linearLayoutstd.setVisibility(View.GONE);
                         linearLayoutfac.setVisibility(View.GONE);
                         showclass.setHasFixedSize(true);
+                        /*FlexboxLayoutManager flexboxLayoutManager = new FlexboxLayoutManager(getActivity());
+                        flexboxLayoutManager.setFlexDirection(FlexDirection.ROW);
+                        flexboxLayoutManager.setJustifyContent(JustifyContent.FLEX_START);*/
                         showclass.setLayoutManager(new LinearLayoutManager(getActivity()));
                         recyclerViewAdapter = new RecyclerViewAdapter(getActivity(), classArrayList);
                         showclass.setAdapter(recyclerViewAdapter);

@@ -16,11 +16,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.learnhub.R;
 import com.example.learnhub.classroomUi.classwork.ShowAssignment;
 import com.example.learnhub.classroomUi.classwork.ShowAssignmentResult;
+import com.example.learnhub.classroomUi.classwork.ShowAttendance;
+import com.example.learnhub.classroomUi.classwork.ShowAttendanceResult;
 import com.example.learnhub.classroomUi.classwork.ShowQuiz;
 import com.example.learnhub.classroomUi.classwork.ShowQuizResult;
 import com.example.learnhub.classroomUi.classwork.notes;
 import com.example.learnhub.classroomUi.classwork.showDocument;
 import com.example.learnhub.model.AssignmentModel;
+import com.example.learnhub.model.AttendanceModel;
 import com.example.learnhub.model.Document;
 import com.example.learnhub.model.UserSession;
 
@@ -61,6 +64,9 @@ public class RecyclerViewAdapterNotes extends RecyclerView.Adapter<RecyclerViewA
         } else if (item instanceof AssignmentModel) {
             AssignmentModel assignment = (AssignmentModel) item;
             holder.topic.setText(assignment.getAssignTitle());
+        } else if (item instanceof AttendanceModel) {
+            AttendanceModel attendance = (AttendanceModel) item;
+            holder.topic.setText(attendance.getAttentitle());
         }
     }
 
@@ -124,6 +130,30 @@ public class RecyclerViewAdapterNotes extends RecyclerView.Adapter<RecyclerViewA
                     Toast.makeText(context, "Quiz result", Toast.LENGTH_SHORT).show();
                     context.startActivity(new Intent(context, ShowQuizResult.class).putExtra("title", (String) item).putExtra("classcode", classcode));
 
+                }
+            }
+            if (itemlist.get(getAdapterPosition() )instanceof AttendanceModel) {
+                Object item  = itemlist.get(getAdapterPosition());
+                AttendanceModel attendance = (AttendanceModel)itemlist.get(getAdapterPosition());
+                String title = attendance.getAttentitle();
+                String date = attendance.getDate();
+                long time = attendance.getTimeLimit();
+                long starttime = attendance.getStartTime();
+                boolean status = attendance.isOpen();
+                UserSession userSession = new UserSession(context);
+                String usertype = userSession.getUserType();
+                if (usertype.equals("Students")){
+                    Toast.makeText(context, "Attendance Selected", Toast.LENGTH_SHORT).show();
+                    context.startActivity(new Intent(context, ShowAttendance.class)
+                            .putExtra("title",title)
+                            .putExtra("date",date)
+                            .putExtra("time",time)
+                            .putExtra("starttime",starttime)
+                            .putExtra("status",status));
+                }else {
+                    Toast.makeText(context, "Attendance Selected", Toast.LENGTH_SHORT).show();
+                    context.startActivity(new Intent(context, ShowAttendanceResult.class)
+                            .putExtra("title",title).putExtra("classcode",classcode));
                 }
             }
 

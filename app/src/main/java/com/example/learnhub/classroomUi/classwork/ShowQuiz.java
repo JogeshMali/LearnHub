@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.learnhub.R;
 import com.example.learnhub.adapter.RecyclerViewAdapterQuiz;
+import com.example.learnhub.model.NotificationModel;
 import com.example.learnhub.model.QuizModel;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -187,6 +188,8 @@ public class ShowQuiz extends AppCompatActivity {
                     // Save the score if it hasn't been submitted yet
                     scoreRef.setValue(submissionData).addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
+                            String username = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+                            NotificationModel.NotificationUtils.sendNotification(getApplicationContext(),Title,"Submiited the Quiz",username,classcode);
                             Toast.makeText(ShowQuiz.this, "Your quiz is submitted!", Toast.LENGTH_SHORT).show();
                             // Disable quiz options (if required)
                             disableQuizOptions();

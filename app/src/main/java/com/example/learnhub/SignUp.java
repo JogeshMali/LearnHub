@@ -33,7 +33,7 @@ public class SignUp extends AppCompatActivity {
     Spinner spinnerprofession ;
     EditText editTextusername;
     EditText editTextpassword,editemail;
-    Button loginbtn ,signupbtn;
+    Button signupbtn;
     DatabaseReference databaseReference;
     ProgressBar progressBar;
 
@@ -52,7 +52,7 @@ public class SignUp extends AppCompatActivity {
         editemail= findViewById(R.id.email);
         editTextusername = findViewById(R.id.uname);
         editTextpassword = findViewById(R.id.password);
-        signupbtn=findViewById(R.id.signupbtn);
+        signupbtn=findViewById(R.id.btnSign);
         progressBar = findViewById(R.id.progressbarSignup);
         changeinProgress(false);
 
@@ -77,7 +77,8 @@ public class SignUp extends AppCompatActivity {
 
                     }
                         UserSession userSession = new UserSession(getApplicationContext());
-                        userSession.saveUserType(profession);                        Intent intent = new Intent(SignUp.this, Facultyhome.class);
+                        userSession.saveUserType(profession);
+                        Intent intent = new Intent(SignUp.this, Facultyhome.class);
 
                         intent.putExtra("username",username);
                         intent.putExtra("email",email);
@@ -101,11 +102,11 @@ public class SignUp extends AppCompatActivity {
     private void changeinProgress(boolean inProgress) {
         if (inProgress){
             progressBar.setVisibility(View.VISIBLE);
-            loginbtn.setVisibility(View.GONE);
+            signupbtn.setVisibility(View.GONE);
         }
         else {
             progressBar.setVisibility(View.GONE);
-            loginbtn.setVisibility(View.VISIBLE);
+            signupbtn.setVisibility(View.VISIBLE);
         }
     }
 

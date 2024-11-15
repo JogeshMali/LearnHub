@@ -5,7 +5,8 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="40dp"
-    tools:context=".chatlayout">
+    tools:context=".chatlayout"
+    >
 
     <androidx.constraintlayout.widget.ConstraintLayout
 
@@ -21,7 +22,8 @@
             android:text="A"
             android:textColor="@color/toolbarcolor"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginLeft="10sp"/>
 
         <TextView
             android:id="@+id/msg"
@@ -32,7 +34,8 @@
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/uname" />
+            app:layout_constraintTop_toBottomOf="@+id/uname"
+            android:layout_marginLeft="10sp"/>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

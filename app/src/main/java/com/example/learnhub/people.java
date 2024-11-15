@@ -1,6 +1,7 @@
 package com.example.learnhub;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -44,7 +45,7 @@ public class people extends Fragment {
     Button  invitebtn;
     TextView username ;
     DatabaseReference db;
-    String classcode;
+    String classcode,classTitle;
     CircleImageView prof;
     RecyclerView stdrecyclerview;
     LinearLayout invitelinearlayout;
@@ -87,6 +88,7 @@ public class people extends Fragment {
 
         Intent intent =  getActivity().getIntent();
         classcode = intent.getStringExtra("classcode");
+        classTitle = intent.getStringExtra("classname");
         facultydetail();
         invitebtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -140,14 +142,28 @@ public class people extends Fragment {
         });
     }
 
-    private void  sendcode(String classcode){
-        String shareclasscode = classcode;
+    private void sendcode(String classcode) {
+        String shareClassCode = classcode;
+        String shareMessage = "Join my class "+classTitle+" on Learnhub with the code: " + shareClassCode;
+
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.setType("Text/plain");
-        String shareMessage = "Join my class on Learnhub with the code "+shareclasscode;
-        shareIntent.putExtra(Intent.EXTRA_TEXT,shareMessage);
-        startActivity(Intent.createChooser(shareIntent,"Share class code via "));
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage);
+
+        // Check if WhatsApp is installed
+        try {
+            PackageManager pm = getActivity().getPackageManager();
+            pm.getPackageInfo("com.whatsapp", PackageManager.GET_ACTIVITIES); // Throws exception if not installed
+            // WhatsApp is installed, set package
+            shareIntent.setPackage("com.whatsapp");
+        } catch (PackageManager.NameNotFoundException e) {
+            // WhatsApp is not installed, do nothing and show all apps in chooser
+        }
+
+        // Start chooser dialog, either with WhatsApp or with all sharing apps
+        startActivity(Intent.createChooser(shareIntent, "Share class code via"));
     }
+
     private void facultydetail() {
         db = FirebaseDatabase.getInstance().getReference("Class");
         Query query = db.orderByChild("classCode").equalTo(classcode);

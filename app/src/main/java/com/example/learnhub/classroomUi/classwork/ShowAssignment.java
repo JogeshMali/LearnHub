@@ -27,6 +27,7 @@ import com.example.learnhub.R;
 import com.example.learnhub.adapter.RecyclerViewAdapterDocs;
 import com.example.learnhub.model.AssignmentModel;
 import com.example.learnhub.model.DocumentModel;
+import com.example.learnhub.model.NotificationModel;
 import com.google.android.flexbox.FlexDirection;
 import com.google.android.flexbox.FlexboxLayoutManager;
 import com.google.android.flexbox.JustifyContent;
@@ -292,6 +293,8 @@ private void saveAssignment(DatabaseReference assignSubref , List<AssignmentMode
         assignSubref.setValue(studentAssignment).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
+                String username = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+                NotificationModel.NotificationUtils.sendNotification(getApplicationContext(),title,"Submiited the Assignment",username,classcode);
                 Toast.makeText(ShowAssignment.this, "Assignment Submitted Successfully", Toast.LENGTH_SHORT).show();
                 changeProgress(false);
                 assignDueDate.setText("Submitted on :" + submissionDate);

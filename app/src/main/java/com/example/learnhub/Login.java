@@ -58,7 +58,7 @@ public class Login extends AppCompatActivity {
         editTextpassword = findViewById(R.id.password);
         editemail=findViewById(R.id.email);
         loginbtn = findViewById(R.id.signupbtn);
-        signupbtn=findViewById(R.id.Signupbtn);
+        signupbtn=findViewById(R.id.siginbtn);
         progressBar = findViewById(R.id.progressBarlogin);
         checkBox();
         changeinProgress(false);
@@ -86,14 +86,12 @@ public class Login extends AppCompatActivity {
         else {
                 Toast.makeText(Login.this, "PLease fill all the option", Toast.LENGTH_SHORT).show();
             }});
-        signupbtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Login.this, SignUp.class);
-                startActivity(intent);
-                finish();
-            }
-        });
+
+       signupbtn.setOnClickListener(v -> {
+           Toast.makeText(this, "Sign up", Toast.LENGTH_SHORT).show();
+           startActivity(new Intent(Login.this, SignUp.class));
+           finish();
+       });
 
 
 

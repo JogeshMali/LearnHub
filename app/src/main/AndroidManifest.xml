@@ -16,6 +16,18 @@
         android:theme="@style/Theme.LearnHub"
         tools:targetApi="31">
         <activity
+            android:name=".adapterLayout.ShowNotification"
+            android:exported="false" />
+        <activity
+            android:name=".classroomUi.classwork.ShowAttendanceResult"
+            android:exported="false" />
+        <activity
+            android:name=".classroomUi.classwork.ShowAttendance"
+            android:exported="false" />
+        <activity
+            android:name=".classroomUi.classwork.CreateAttendance"
+            android:exported="false" />
+        <activity
             android:name=".classroomUi.classwork.ShowStudentAssignment"
             android:exported="false" />
         <activity

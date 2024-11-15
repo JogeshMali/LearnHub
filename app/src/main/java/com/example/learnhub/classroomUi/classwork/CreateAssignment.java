@@ -29,6 +29,7 @@ import com.example.learnhub.R;
 import com.example.learnhub.adapter.RecyclerViewAdapterDocs;
 import com.example.learnhub.model.AssignmentModel;
 import com.example.learnhub.model.DocumentModel;
+import com.example.learnhub.model.NotificationModel;
 import com.google.android.flexbox.FlexDirection;
 import com.google.android.flexbox.FlexboxLayoutManager;
 import com.google.android.flexbox.JustifyContent;
@@ -213,6 +214,7 @@ public class CreateAssignment extends AppCompatActivity {
         String  username = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
         assignRef.child(username).setValue(assignment).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
+                NotificationModel.NotificationUtils.sendNotification(getApplicationContext(),title,"Uploaded the Assignment",username,classcode);
                 Toast.makeText(this, "Assignment uploaded successfully", Toast.LENGTH_SHORT).show();
                 finish();
             } else {

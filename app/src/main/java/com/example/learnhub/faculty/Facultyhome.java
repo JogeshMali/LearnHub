@@ -123,7 +123,7 @@ public class Facultyhome extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_gallery, R.id.nav_login,R.id.nav_logout)
+                R.id.nav_home, R.id.nav_gallery, R.id.nav_logout)
                 .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_facultyhome);
@@ -144,7 +144,12 @@ public class Facultyhome extends AppCompatActivity {
 
                 }
                 if (item.getItemId() == R.id.nav_notification){
-                    navController.navigate(R.id.nav_login);
+                    navController.navigate(R.id.nav_notification);
+                    drawer.closeDrawer(GravityCompat.START);
+                    return true;
+                }
+                if (item.getItemId() == R.id.nav_help){
+                    navController.navigate(R.id.nav_help);
                     drawer.closeDrawer(GravityCompat.START);
                     return true;
                 }

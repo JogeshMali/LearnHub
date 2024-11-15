@@ -1,7 +1,10 @@
 package com.example.learnhub.student;
 
 import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -43,6 +46,12 @@ public class JoinClass extends AppCompatActivity {
         setContentView(R.layout.activity_join_class);
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            Drawable upArrow = getResources().getDrawable(R.drawable.backbtn); // Default back icon for AppCompat
+            upArrow.setColorFilter(getResources().getColor(android.R.color.white), PorterDuff.Mode.SRC_ATOP);
+            getSupportActionBar().setHomeAsUpIndicator(upArrow);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
         Objects.requireNonNull(getSupportActionBar()).setTitle("Join class");
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -59,13 +68,13 @@ public class JoinClass extends AppCompatActivity {
         classcode=findViewById(R.id.classcode);
         joinbtn=findViewById(R.id.joinbtn);
 
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+        /*toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(JoinClass.this, HomeFragment.class);
                 startActivity(intent);
             }
-        });
+        });*/
         joinbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -75,6 +84,14 @@ public class JoinClass extends AppCompatActivity {
             }
         });
 
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
     private void joinclass(String username ,String email,String classname,String classcode){
 

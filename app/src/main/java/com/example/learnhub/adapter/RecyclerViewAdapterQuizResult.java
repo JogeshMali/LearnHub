@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.learnhub.R;
 import com.example.learnhub.classroomUi.classwork.ShowStudentAssignment;
 import com.example.learnhub.model.AssignmentResultModel;
+import com.example.learnhub.model.AttendanceModel;
 import com.example.learnhub.model.QuizResultModel;
 
 import java.util.List;
@@ -48,6 +49,17 @@ public class RecyclerViewAdapterQuizResult extends RecyclerView.Adapter<Recycler
             AssignmentResultModel assignmentResultModel  =(AssignmentResultModel) quizResultModelList.get(position);
             holder.qname.setText(assignmentResultModel.getUsername());
             holder.score.setText(assignmentResultModel.getSubmissionStatus());
+        } else if (quizResultModelList.get(position) instanceof AttendanceModel.StudentAttendance) {
+            AttendanceModel.StudentAttendance studentAttendance = (AttendanceModel.StudentAttendance) quizResultModelList.get(position);
+            holder.qname.setText(studentAttendance.getStdName());
+            boolean isPresent = studentAttendance.isPresent();
+            if (isPresent) {
+                holder.score.setText("Present");
+            }else{
+                holder.score.setText("Absent");
+            }
+
+
         }
     }
 

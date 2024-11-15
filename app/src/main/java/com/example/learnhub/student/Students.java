@@ -9,9 +9,9 @@ public class Students {
 
     }
 
-    public Students(String name, String password) {
+    public Students(String name, String email) {
         this.name = name;
-        this.password = password;
+        this.email = email;
     }
 
     public Students(String name, String password, String email) {
