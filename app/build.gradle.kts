@@ -56,4 +56,7 @@ dependencies {
     implementation(libs.glide)
     implementation(libs.floating.action.menu)
     implementation(libs.flexbox)
+    implementation(libs.sdp)
+    implementation(libs.ssp)
+
 }

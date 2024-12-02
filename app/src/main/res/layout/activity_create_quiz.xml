@@ -6,21 +6,23 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:layout_gravity="center">
+
+    >
 
  <!-- Title -->
- <TextView
+ <!-- Question Title -->
+
+ <androidx.appcompat.widget.Toolbar
+     android:id="@+id/quiz_Toolbar"
      android:layout_width="match_parent"
-     android:layout_height="wrap_content"
-     android:text="Create Quiz"
-     android:textColor="@color/toolbarcolor"
-     android:textStyle="bold"
-     android:textSize="35sp"
-     android:textAlignment="center"
+     android:layout_height="?attr/actionBarSize"
+     android:background="@color/toolbarcolor"
+     app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+     app:title=" Create Quiz"
+     app:titleTextColor="@color/white"
+     tools:ignore="MissingConstraints"
      android:layout_marginBottom="16dp"/>
 
- <!-- Question Title -->
  <EditText
      android:id="@+id/quiz_title"
      android:layout_width="match_parent"

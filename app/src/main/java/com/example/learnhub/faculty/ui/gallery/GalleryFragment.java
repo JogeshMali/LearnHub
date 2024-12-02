@@ -57,6 +57,11 @@ public class GalleryFragment extends Fragment {
     private void fetchNotification() {
         UserSession userSession = new UserSession(getContext());
         String usertype = userSession.getUserType();
+        if (usertype.equals("Faculty")){
+            usertype = "Students";
+        }else {
+            usertype = "Faculty";
+        }
         Log.d("Gallerfragment","usertype : "+usertype);
         DatabaseReference notificationsRef = FirebaseDatabase.getInstance().getReference("Notifications").child(usertype);
 

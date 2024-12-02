@@ -7,24 +7,17 @@
     android:layout_height="match_parent"
     tools:context=".classroomUi.classwork.CreateAttendance"
     android:orientation="vertical"
-    android:padding="20sp"
     android:gravity="center_horizontal">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Create Attendance"
-        android:textColor="@color/toolbarcolor"
-        android:textStyle="bold"
-        android:textSize="30sp"
-        android:textAlignment="center"/>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="4sp"
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/attendance_Toolbar"
+        android:layout_width="393dp"
+        android:layout_height="77dp"
         android:background="@color/toolbarcolor"
-        android:layout_marginTop="8sp"
-        android:paddingLeft="10sp"/>
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:title=" Create Attendance"
+        app:titleTextColor="@color/white"
+        tools:ignore="MissingConstraints" />
 
     <!-- Title Input -->
     <EditText

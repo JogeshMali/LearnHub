@@ -95,14 +95,14 @@ public class RecyclerViewAdapterNotes extends RecyclerView.Adapter<RecyclerViewA
                 Document document = (Document) itemlist.get(getAdapterPosition());
                 ArrayList<String> documentArrayList = new ArrayList<>();
                 documentArrayList = (ArrayList<String>) document.getDocumentList();
-                Intent intent = new Intent(context, notes.class);
+                Intent intent = new Intent(itemView.getContext(), notes.class);
                 intent.putExtra("topic", document.getTopic());
                 intent.putExtra("description", document.getDescription());
                 intent.putStringArrayListExtra("documentList", documentArrayList);
                 Log.d("notesActivity", document.getTopic());
                 Log.d("notesActivity", document.getDescription());
                 Log.d("notesActivity", String.valueOf(document.getDocumentList().size()));
-                context.startActivity(intent);
+                itemView.getContext().startActivity(intent);
             }
             if (itemlist.get(getAdapterPosition()) instanceof AssignmentModel){
                 AssignmentModel assignmentModel  =(AssignmentModel) itemlist.get(getAdapterPosition());
@@ -115,7 +115,7 @@ public class RecyclerViewAdapterNotes extends RecyclerView.Adapter<RecyclerViewA
                             .putExtra("title", title).putExtra("classcode", classcode)
                     );
                 }else{
-                    context.startActivity(new Intent(context, ShowAssignmentResult.class)
+                    itemView.getContext().startActivity(new Intent(itemView.getContext(), ShowAssignmentResult.class)
                             .putExtra("title", title).putExtra("classcode", classcode));
                 }
             }
@@ -128,7 +128,7 @@ public class RecyclerViewAdapterNotes extends RecyclerView.Adapter<RecyclerViewA
                 }
                 else {
                     Toast.makeText(context, "Quiz result", Toast.LENGTH_SHORT).show();
-                    context.startActivity(new Intent(context, ShowQuizResult.class).putExtra("title", (String) item).putExtra("classcode", classcode));
+                    itemView.getContext().startActivity(new Intent(itemView.getContext(), ShowQuizResult.class).putExtra("title", (String) item).putExtra("classcode", classcode));
 
                 }
             }
@@ -152,7 +152,7 @@ public class RecyclerViewAdapterNotes extends RecyclerView.Adapter<RecyclerViewA
                             .putExtra("status",status));
                 }else {
                     Toast.makeText(context, "Attendance Selected", Toast.LENGTH_SHORT).show();
-                    context.startActivity(new Intent(context, ShowAttendanceResult.class)
+                    itemView.getContext().startActivity(new Intent(itemView.getContext(), ShowAttendanceResult.class)
                             .putExtra("title",title).putExtra("classcode",classcode));
                 }
             }

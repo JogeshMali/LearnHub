@@ -30,6 +30,7 @@ public class classroom extends AppCompatActivity {
     BottomNavigationView bottomNavigationView;
     Toolbar toolbar ;
     String classcode,classTitle;
+    int classbg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +41,7 @@ public class classroom extends AppCompatActivity {
         Intent intent = getIntent();
          classTitle = intent.getStringExtra("classname");
          classcode = intent.getStringExtra("classcode");
+         classbg = intent.getIntExtra("classimg",0);
         /*toolbar.setTitle(classTitle);*/
         toolbar.getOverflowIcon().setTint(getResources().getColor(android.R.color.white));
         setSupportActionBar(toolbar);
@@ -109,6 +111,7 @@ public class classroom extends AppCompatActivity {
         Bundle args = new Bundle();
         args.putString("classcode",classcode);
         args.putString("classname",classTitle);
+        args.putInt("classimg",classbg);
         UserSession userSession=new UserSession(getApplicationContext());
         userSession.saveClassCode(classcode);
         fragment.setArguments(args);

@@ -13,7 +13,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.learnhub.ChatMessage;
 import com.example.learnhub.R;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class RecyclerViewAdapterChat extends RecyclerView.Adapter<RecyclerViewAdapterChat.ViewHolder> {
 
@@ -37,6 +41,15 @@ public class RecyclerViewAdapterChat extends RecyclerView.Adapter<RecyclerViewAd
       ChatMessage chatMessage = chatMessagesList.get(position);
       holder.username.setText(chatMessage.getUser());
       holder.message.setText(chatMessage.getMessage());
+      holder.time.setText(formatTime(chatMessage.getMessagetime()));
+    }
+
+    private String formatTime(long messagetime) {
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+            return dateFormat.format(new Date(messagetime));
+
+
     }
 
     @Override
@@ -44,12 +57,13 @@ public class RecyclerViewAdapterChat extends RecyclerView.Adapter<RecyclerViewAd
         return chatMessagesList.size();
     }
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-        public TextView message,username;
+        public TextView message,username,time;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
             message = itemView.findViewById(R.id.msg);
             username = itemView.findViewById(R.id.uname);
+            time= itemView.findViewById(R.id.timestamp);
         }
 
         @Override

@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.learnhub.adapter.RecyclerViewAdapterpeople;
+import com.example.learnhub.model.UserClass;
 import com.google.firebase.Firebase;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -47,10 +48,10 @@ public class people extends Fragment {
     DatabaseReference db;
     String classcode,classTitle;
     CircleImageView prof;
-    RecyclerView stdrecyclerview;
+    RecyclerView stdrecyclerview, facrecyclerview;
     LinearLayout invitelinearlayout;
-    RecyclerViewAdapterpeople peopleadapter;
-    List<Join> joinList ;
+    RecyclerViewAdapterpeople peopleadapter,facAdapter;
+    List<UserClass> joinList ,facList;
 
 
     public people() {
@@ -81,15 +82,15 @@ public class people extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_people, container, false);
-        username = view.findViewById(R.id.username);
-        prof = view .findViewById(R.id.profilephoto);
+
+
 
         invitebtn =  view.findViewById(R.id.invitebtn);
 
         Intent intent =  getActivity().getIntent();
         classcode = intent.getStringExtra("classcode");
         classTitle = intent.getStringExtra("classname");
-        facultydetail();
+
         invitebtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -97,8 +98,17 @@ public class people extends Fragment {
             }
         });
         stdrecyclerview = view.findViewById(R.id.stdrecyclerview);
+        facrecyclerview = view.findViewById(R.id.facRecyclerView);
         invitelinearlayout = view.findViewById(R.id.invitelayout);
         joinList = new ArrayList<>();
+        facList = new ArrayList<>();
+
+        facrecyclerview.setHasFixedSize(true);
+        facrecyclerview.setLayoutManager(new LinearLayoutManager(getContext()));
+        facAdapter = new RecyclerViewAdapterpeople(getContext(),facList);
+        facrecyclerview.setAdapter(facAdapter);
+
+
         stdrecyclerview.setHasFixedSize(true);
         stdrecyclerview.setLayoutManager(new LinearLayoutManager(getActivity()));
         addStdinList();
@@ -120,26 +130,76 @@ public class people extends Fragment {
     }
 
     private void addStdinList() {
-        DatabaseReference stdjoinref = FirebaseDatabase.getInstance().getReference("Join");
-        Query query = stdjoinref.orderByChild("classCode").equalTo(classcode);
-        query.addValueEventListener(new ValueEventListener() {
-
+        DatabaseReference stdjoinref = FirebaseDatabase.getInstance().getReference("Classes");
+        stdjoinref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                joinList.clear();
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()){
-                    Join join = dataSnapshot.getValue(Join.class);
-                    joinList.add(join);
+                for (DataSnapshot classSnapshot : snapshot.getChildren()) { // Iterate through classes
+                    for (DataSnapshot subjectSnapshot : classSnapshot.getChildren()) { // Iterate through subjects
+                        if (subjectSnapshot.hasChild(classcode)) {
+                            DatabaseReference keyRef = subjectSnapshot.child(classcode).getRef();
+
+                            // Fetch Faculty
+                            keyRef.child("Faculty").addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot facultySnapshot) {
+                                    if (facultySnapshot.exists()) {
+                                        for (DataSnapshot student : facultySnapshot.getChildren()) {
+                                            String studentname = student.child("name").getValue(String.class);
+                                            String email = student.child("email").getValue(String.class);
+                                            String usertype = student.child("usertype").getValue(String.class);
+                                            facList.add(new UserClass(studentname,email,usertype));
+                                        }
+                                    }
+                                    facAdapter.notifyDataSetChanged();
+
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+                                    System.out.println("Failed to fetch faculty: " + error.getMessage());
+                                }
+                            });
+
+                            // Fetch Students
+                            keyRef.child("Students").addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot studentSnapshot) {
+                                    if (studentSnapshot.exists()) {
+                                        for (DataSnapshot student : studentSnapshot.getChildren()) {
+                                            String studentname = student.child("name").getValue(String.class);
+                                            String email = student.child("email").getValue(String.class);
+                                            String usertype = student.child("usertype").getValue(String.class);
+                                            joinList.add(new UserClass(studentname,email,usertype));
+                                        }
+                                    }
+                                    peopleadapter.notifyDataSetChanged();
+                                    CheckStudent();
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+                                    System.out.println("Failed to fetch students: " + error.getMessage());
+                                }
+                            });
+
+                            return; // Exit once the unique key is found
+                        }
+                    }
+
                 }
-                CheckStudent();
-                peopleadapter.notifyDataSetChanged();
+                System.out.println("Unique key not found in any class/subject.");
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                System.out.println("Failed to search database: " + error.getMessage());
             }
         });
+
+
+
+
     }
 
     private void sendcode(String classcode) {
@@ -164,30 +224,7 @@ public class people extends Fragment {
         startActivity(Intent.createChooser(shareIntent, "Share class code via"));
     }
 
-    private void facultydetail() {
-        db = FirebaseDatabase.getInstance().getReference("Class");
-        Query query = db.orderByChild("classCode").equalTo(classcode);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    for (DataSnapshot usersnap : snapshot.getChildren()) {
-                        String user = usersnap.child("username").getValue(String.class);
-                        username.setText(user);
-                        String email = usersnap.child("email").getValue(String.class);
-                        setProfile(email);
-                    }
-                } else {
-                    Toast.makeText(getActivity(), "No username", Toast.LENGTH_SHORT).show();
-                }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
         private void setProfile (String email){
             DatabaseReference facultyref = FirebaseDatabase.getInstance().getReference("Faculty");
                 facultyref.child(email.replace(".", ",")).child("imageUrl").get().addOnCompleteListener(task -> {

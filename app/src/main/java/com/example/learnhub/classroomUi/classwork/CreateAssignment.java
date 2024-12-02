@@ -3,9 +3,12 @@ package com.example.learnhub.classroomUi.classwork;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,6 +22,7 @@ import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -30,6 +34,7 @@ import com.example.learnhub.adapter.RecyclerViewAdapterDocs;
 import com.example.learnhub.model.AssignmentModel;
 import com.example.learnhub.model.DocumentModel;
 import com.example.learnhub.model.NotificationModel;
+import com.example.learnhub.model.UserSession;
 import com.google.android.flexbox.FlexDirection;
 import com.google.android.flexbox.FlexboxLayoutManager;
 import com.google.android.flexbox.JustifyContent;
@@ -59,6 +64,7 @@ public class CreateAssignment extends AppCompatActivity {
     List<Uri> documentList;
     RecyclerViewAdapterDocs adapterDocs;
     ProgressBar progressBar;
+    Toolbar toolbar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +75,15 @@ public class CreateAssignment extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        toolbar  =findViewById(R.id.Assignment_Toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            Drawable upArrow = getResources().getDrawable(R.drawable.backbtn); // Default back icon for AppCompat
+            upArrow.setColorFilter(getResources().getColor(android.R.color.white), PorterDuff.Mode.SRC_ATOP);
+            getSupportActionBar().setHomeAsUpIndicator(upArrow);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
         Intent intent  = getIntent();
         classcode= intent.getStringExtra("classcode");
         dueDate = findViewById(R.id.et_dueDate);
@@ -110,6 +125,14 @@ public class CreateAssignment extends AppCompatActivity {
             }
         });
 
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void showDatePicker() {
@@ -182,7 +205,8 @@ public class CreateAssignment extends AppCompatActivity {
 
         DatabaseReference assignRef = FirebaseDatabase.getInstance().getReference("AssignmentModel").child(classcode).push();
         String assignmentId = assignRef.getKey();
-        String  username = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+        UserSession userSession = new UserSession(getApplicationContext());
+        String username = userSession.getUserName();
         StorageReference assignStorage = FirebaseStorage.getInstance().getReference("Assignments/" +classcode+"/"+ assignmentId+"/"+title+"/"+username);
 
         List<AssignmentModel.FileInfo> fileInfoList = new ArrayList<>();
@@ -211,7 +235,8 @@ public class CreateAssignment extends AppCompatActivity {
 
     private void saveAssignmentData(DatabaseReference assignRef, List<AssignmentModel.FileInfo> fileMap) {
         AssignmentModel assignment = new AssignmentModel(title, description, DueDate,fileMap);
-        String  username = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+        UserSession userSession = new UserSession(getApplicationContext());
+        String username = userSession.getUserName();
         assignRef.child(username).setValue(assignment).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 NotificationModel.NotificationUtils.sendNotification(getApplicationContext(),title,"Uploaded the Assignment",username,classcode);

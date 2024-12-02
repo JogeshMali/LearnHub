@@ -23,6 +23,8 @@ import com.example.learnhub.adapter.RecyclerViewAdapter;
 import com.example.learnhub.adapter.RecyclerViewAdapterStd;
 import com.example.learnhub.databinding.FragmentHomeBinding;
 import com.example.learnhub.faculty.Classes;
+import com.example.learnhub.model.UserClass;
+import com.example.learnhub.model.UserSession;
 import com.example.learnhub.student.JoinClass;
 import com.google.android.flexbox.FlexDirection;
 import com.google.android.flexbox.FlexboxLayoutManager;
@@ -42,10 +44,12 @@ public class HomeFragment extends Fragment {
     RecyclerView showclass,showclassstd;
     RecyclerViewAdapter recyclerViewAdapter;
     RecyclerViewAdapterStd recyclerViewAdapterStd;
-    ArrayList<Class> classArrayList;
+    ArrayList<UserClass> classArrayList;
+
     ArrayList<Join> joinArrayList;
      DatabaseReference databaseReference,databaseReferencejoin;
     LinearLayout linearLayoutfac,linearLayoutstd;
+    String uname,emailid,usertype;
 
     Query query;
 
@@ -61,21 +65,31 @@ public class HomeFragment extends Fragment {
         Button button = root.findViewById(R.id.createclassbtn);
         Button joinclassbtn =root.findViewById(R.id.joinclassbtn);
         Intent intent = getActivity().getIntent();
-        String uname = intent.getStringExtra("username");
-        String emailid = intent.getStringExtra("email");
-        String usertype = intent.getStringExtra("usertype");
+        uname = intent.getStringExtra("username");
+        emailid = intent.getStringExtra("email");
+        usertype = intent.getStringExtra("usertype");
 
         linearLayoutfac =root.findViewById(R.id.Faclayout);
         linearLayoutstd  =root.findViewById(R.id.stdlayout);
         showclass=root.findViewById(R.id.showclass);
         showclassstd =root.findViewById(R.id.showclassstd);
         classArrayList = new ArrayList<>();
-        joinArrayList = new ArrayList<>();
+
+        showclass.setHasFixedSize(true);
+        showclass.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerViewAdapter = new RecyclerViewAdapter(getContext(),classArrayList);
+        showclass.setAdapter(recyclerViewAdapter);
+        fetchClass();
+
+
+
+        /*joinArrayList = new ArrayList<>();
         databaseReference= FirebaseDatabase.getInstance().getReference("Class");
         databaseReferencejoin= FirebaseDatabase.getInstance().getReference("Join");
         query = "Faculty".equals(usertype) ?
                 databaseReference.orderByChild("email").equalTo(emailid) :
-                databaseReferencejoin.orderByChild("email").equalTo(emailid);
+                databaseReferencejoin.orderByChild("email").equalTo(emailid);*/
+/*
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -90,9 +104,11 @@ public class HomeFragment extends Fragment {
                         linearLayoutstd.setVisibility(View.GONE);
                         linearLayoutfac.setVisibility(View.GONE);
                         showclass.setHasFixedSize(true);
-                        /*FlexboxLayoutManager flexboxLayoutManager = new FlexboxLayoutManager(getActivity());
+                        */
+/*FlexboxLayoutManager flexboxLayoutManager = new FlexboxLayoutManager(getActivity());
                         flexboxLayoutManager.setFlexDirection(FlexDirection.ROW);
-                        flexboxLayoutManager.setJustifyContent(JustifyContent.FLEX_START);*/
+                        flexboxLayoutManager.setJustifyContent(JustifyContent.FLEX_START);*//*
+
                         showclass.setLayoutManager(new LinearLayoutManager(getActivity()));
                         recyclerViewAdapter = new RecyclerViewAdapter(getActivity(), classArrayList);
                         showclass.setAdapter(recyclerViewAdapter);
@@ -130,6 +146,7 @@ public class HomeFragment extends Fragment {
 
             }
         });
+*/
 
         // Set a click listener for the button
         button.setOnClickListener(new View.OnClickListener() {
@@ -157,9 +174,85 @@ public class HomeFragment extends Fragment {
         return root;
     }
 
+    private void checkClass() {
+        if (classArrayList.isEmpty()) {
+            /*if ("Faculty".equals(usertype)) {
+                linearLayoutfac.setVisibility(View.VISIBLE);
+                linearLayoutstd.setVisibility(View.GONE);
+            } else {
+                linearLayoutstd.setVisibility(View.VISIBLE);
+                linearLayoutfac.setVisibility(View.GONE);
+            }
+            showclass.setVisibility(View.GONE);
+            showclassstd.setVisibility(View.GONE);*/
+            Toast.makeText(getActivity(), "No class found", Toast.LENGTH_SHORT).show();
+        } else {
+            linearLayoutfac.setVisibility(View.GONE);
+            linearLayoutstd.setVisibility(View.GONE);
+            showclass.setVisibility(View.VISIBLE);
+            showclassstd.setVisibility(View.GONE);
+        }
+    }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    private void fetchClass(){
+        classArrayList.clear();
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Classes");
+        UserSession userSession = new UserSession(getContext());
+        String password  = userSession.getUserPassword();
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                boolean userFound = false;
+
+                for (DataSnapshot classSnapshot : dataSnapshot.getChildren()) {
+                    String className = classSnapshot.getKey(); // Get Class Name (e.g., "Class 10")
+
+                    for (DataSnapshot subjectSnapshot : classSnapshot.getChildren()) {
+                        String subjectName = subjectSnapshot.getKey(); // Get Subject Name (e.g., "Marathi")
+
+                        for (DataSnapshot classcodeSnapshot : subjectSnapshot.getChildren()) {
+                            String classcode = classcodeSnapshot.getKey();
+
+                            DataSnapshot Snapshot = classcodeSnapshot.child(usertype);
+                            if (Snapshot.exists()) {
+                                for (DataSnapshot userSnapshot : Snapshot.getChildren()) {
+                                    // Fetch user details from the database
+                                    String dbName = userSnapshot.child("name").getValue(String.class);
+                                    String dbEmail = userSnapshot.child("email").getValue(String.class);
+                                    String dbPassword = userSnapshot.child("password").getValue(String.class);
+
+                                    // Check if the name, email, and password match
+                                    if (uname.equalsIgnoreCase(dbName) &&
+                                            emailid.equalsIgnoreCase(dbEmail) &&
+                                            password.equals(dbPassword)) {
+                                        userFound = true;
+                                        classArrayList.add(new UserClass(className, subjectName, dbName, dbEmail, usertype,classcode));
+
+                                        break; // Exit loop once the user is found
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                recyclerViewAdapter.notifyDataSetChanged();
+                checkClass();
+                if (!userFound) {
+                    Toast.makeText(getActivity(), "No matching classes found for your account", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e("FirebaseError", databaseError.getMessage());
+            }
+        });
+
     }
 }

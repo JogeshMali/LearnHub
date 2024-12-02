@@ -130,15 +130,15 @@ public class ShowAttendance extends AppCompatActivity {
         String currentDate = dateFormat.format(new Date());
         DatabaseReference attendRef = FirebaseDatabase.getInstance().getReference("StudentAttendance")
                 .child(classcode).child(title);
-        String uid = FirebaseAuth.getInstance().getUid();
-        String username = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
-        String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+        UserSession userSession = new UserSession(getApplicationContext());
+        String username = userSession.getUserName();
+        String email = userSession.getUserEmail();
 
         AttendanceModel.StudentAttendance studentAttendance = new AttendanceModel.StudentAttendance(
                 title, currentDate, username, email, System.currentTimeMillis(), isPresent
         );
 
-        attendRef.child(uid).setValue(studentAttendance).addOnCompleteListener(task -> {
+        attendRef.child(username).setValue(studentAttendance).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 NotificationModel.NotificationUtils.sendNotification(getApplicationContext(),title,"Submiited the Attendance",username,classcode);
                 Toast.makeText(this, "Attendance Submitted Successfully", Toast.LENGTH_SHORT).show();
@@ -149,9 +149,10 @@ public class ShowAttendance extends AppCompatActivity {
     }
 
     private void fetchAttendance() {
-        String uid = FirebaseAuth.getInstance().getUid();
+        UserSession userSession = new UserSession(getApplicationContext());
+        String username = userSession.getUserName();
         DatabaseReference attendRef = FirebaseDatabase.getInstance().getReference("StudentAttendance")
-                .child(classcode).child(title).child(uid);
+                .child(classcode).child(title).child(username);
         isfetchAttendance =false;
         attendRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

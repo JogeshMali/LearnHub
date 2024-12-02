@@ -4,6 +4,7 @@
     <string-array name="spinner_items">
         <item>Faculty</item>
         <item>Student</item>
+        <item>Parent</item>
     </string-array>
     <string name="title_activity_facultyhome">facultyhome</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>

@@ -20,6 +20,7 @@ import com.example.learnhub.R;
 import com.example.learnhub.adapter.RecyclerViewAdapterQuiz;
 import com.example.learnhub.model.NotificationModel;
 import com.example.learnhub.model.QuizModel;
+import com.example.learnhub.model.UserSession;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -168,13 +169,12 @@ public class ShowQuiz extends AppCompatActivity {
     }
 
     private void SubmitQuiz() {
-        String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        String username  = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+        UserSession userSession = new UserSession(getApplicationContext());
+        String username = userSession.getUserName();
         DatabaseReference scoreRef = FirebaseDatabase.getInstance().getReference("QuizUser")
                 .child("classroom")
                 .child(classcode)
                 .child(Title)
-                .child(userID)
                 .child(username)
                 .child("Score");
 
@@ -246,13 +246,12 @@ public class ShowQuiz extends AppCompatActivity {
     }
 
     private void checkQuizSubmissionStatus() {
-        String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        String username =FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+        UserSession userSession = new UserSession(getApplicationContext());
+        String username = userSession.getUserName();
         DatabaseReference scoreRef = FirebaseDatabase.getInstance().getReference("QuizUser")
                 .child("classroom")
                 .child(classcode)
                 .child(Title)
-                .child(userID)
                 .child(username)
                 .child("Score");
 

@@ -1,7 +1,6 @@
 package com.example.learnhub.adapter;
 
 import android.content.Context;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.learnhub.Join;
 import com.example.learnhub.R;
+import com.example.learnhub.model.UserClass;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -21,9 +21,9 @@ import java.util.List;
 
 public class RecyclerViewAdapterpeople extends RecyclerView.Adapter<RecyclerViewAdapterpeople.ViewHolder> {
     private Context context;
-    private List<Join> peopleList;
+    private List<UserClass> peopleList;
 
-    public RecyclerViewAdapterpeople(Context context, List<Join> peopleList) {
+    public RecyclerViewAdapterpeople(Context context, List<UserClass> peopleList) {
         this.context = context;
         this.peopleList = peopleList;
     }
@@ -38,10 +38,10 @@ public class RecyclerViewAdapterpeople extends RecyclerView.Adapter<RecyclerView
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerViewAdapterpeople.ViewHolder holder, int position) {
-     Join join = peopleList.get(position);
-     holder.stdname.setText(join.getUsername());
-     DatabaseReference stdref = FirebaseDatabase.getInstance().getReference("Students");
-     stdref.child(join.getEmail().replace(".", ",")).child("imageUrl").get().addOnCompleteListener(task -> {
+     UserClass join = peopleList.get(position);
+     holder.stdname.setText(join.getUserName());
+     DatabaseReference stdref = FirebaseDatabase.getInstance().getReference(join.getUserType());
+     stdref.child(join.getUserEmail().replace(".", ",")).child("imageUrl").get().addOnCompleteListener(task -> {
         if (task.isSuccessful()) {
             String imageUrl = task.getResult().getValue(String.class);
             if (imageUrl != null) {

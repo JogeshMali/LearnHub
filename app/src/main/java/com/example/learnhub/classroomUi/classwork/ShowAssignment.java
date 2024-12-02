@@ -28,6 +28,7 @@ import com.example.learnhub.adapter.RecyclerViewAdapterDocs;
 import com.example.learnhub.model.AssignmentModel;
 import com.example.learnhub.model.DocumentModel;
 import com.example.learnhub.model.NotificationModel;
+import com.example.learnhub.model.UserSession;
 import com.google.android.flexbox.FlexDirection;
 import com.google.android.flexbox.FlexboxLayoutManager;
 import com.google.android.flexbox.JustifyContent;
@@ -254,14 +255,14 @@ private void submitAssignment() {
             if (!fileMap.isEmpty()) {
                 submissionTime();
                 checkSubmissionStatus(duedate);
-                String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
-                String username = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
-                String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                UserSession userSession = new UserSession(getApplicationContext());
+                String username = userSession.getUserName();
+                String email = userSession.getUserEmail();
                 DatabaseReference assignSubref = FirebaseDatabase.getInstance().getReference("StudentAssignment")
                         .child("classroom")
                         .child(classcode)
                         .child(title)
-                        .child(uid);
+                        .child(username);
                 StorageReference storageReference = FirebaseStorage.getInstance().getReference("StudentAssignment/" + classcode + "/" + title + "/" + email + "/" + username + "/");
                 List<AssignmentModel.FileInfo> fileInfoList = new ArrayList<>();
                 for (int i = 0; i < documentList.size(); i++) {
@@ -287,13 +288,15 @@ private void submitAssignment() {
 
     }
 private void saveAssignment(DatabaseReference assignSubref , List<AssignmentModel.FileInfo> fileInfoList) {
-        String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
-        String username = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
-        AssignmentModel.StudentAssignment studentAssignment = new AssignmentModel.StudentAssignment(username, email, submissionDate, submissionStatus, fileInfoList);
+    UserSession userSession = new UserSession(getApplicationContext());
+    String username = userSession.getUserName();
+    String email = userSession.getUserEmail();
+    AssignmentModel.StudentAssignment studentAssignment = new AssignmentModel.StudentAssignment(username, email, submissionDate, submissionStatus, fileInfoList);
         assignSubref.setValue(studentAssignment).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                String username = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+                UserSession userSession = new UserSession(getApplicationContext());
+                String username = userSession.getUserName();
                 NotificationModel.NotificationUtils.sendNotification(getApplicationContext(),title,"Submiited the Assignment",username,classcode);
                 Toast.makeText(ShowAssignment.this, "Assignment Submitted Successfully", Toast.LENGTH_SHORT).show();
                 changeProgress(false);
@@ -367,12 +370,13 @@ private void checkSubmissionStatus(String duedate){
         }
     }
     private void fetchSubmittedAssignment() {
-        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        UserSession userSession = new UserSession(getApplicationContext());
+        String username = userSession.getUserName();
         DatabaseReference assignRef = FirebaseDatabase.getInstance().getReference("StudentAssignment")
                 .child("classroom")
                 .child(classcode)
                 .child(title)
-                .child(uid);
+                .child(username);
 
         assignRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -409,12 +413,13 @@ private void checkSubmissionStatus(String duedate){
         });
     }
     private void clearDataInFireBase(){
-        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        UserSession userSession = new UserSession(getApplicationContext());
+        String username = userSession.getUserName();
         DatabaseReference assignSubref = FirebaseDatabase.getInstance().getReference("StudentAssignment")
                 .child("classroom")
                 .child(classcode)
                 .child(title)
-                .child(uid);
+                .child(username);
         assignSubref.child("fileMap").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

@@ -52,7 +52,7 @@ public class Login extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        databaseReference = FirebaseDatabase.getInstance().getReference();
+        databaseReference = FirebaseDatabase.getInstance().getReference("User");
         spinnerprofession = findViewById(R.id.spinner);
         editTextusername = findViewById(R.id.uname);
         editTextpassword = findViewById(R.id.password);
@@ -74,8 +74,10 @@ public class Login extends AppCompatActivity {
                 if (profession.equals("Student")) {
                     CheckLogin("Students", username,email, password);
 
-                } else {
+                } else if(profession.equals("Faculty")) {
                     CheckLogin("Faculty",username, email, password);
+                }else {
+                    CheckParentLogin("Parent",username, email, password);
                 }
 
 
@@ -98,17 +100,30 @@ public class Login extends AppCompatActivity {
 
             }
 
+
+
     private void checkBox() {
         SharedPreferences sharedPreferences =  getSharedPreferences(SHARED_PREFS,MODE_PRIVATE);
         String  check = sharedPreferences.getString("name","");
         String  username = sharedPreferences.getString("username","");
         String  email = sharedPreferences.getString("email","");
         String  usertype = sharedPreferences.getString("usertype","");
-        if (check.equals("true")){
+        String  stdname = sharedPreferences.getString("stdName","");
+        String  stdclass = sharedPreferences.getString("stdClass","");
+        if (check.equals("true")&& !usertype.equals("Parent")){
             Intent intent = new Intent(Login.this, Facultyhome.class);
             intent.putExtra("username",username);
             intent.putExtra("email",email);
             intent.putExtra("usertype",usertype);
+            startActivity(intent);
+            finish();
+        }else if (check.equals("true") && usertype.equals("Parent")){
+            Intent intent = new Intent(Login.this, Parent.class);
+            intent.putExtra("username",username);
+            intent.putExtra("email",email);
+            intent.putExtra("usertype",usertype);
+            intent.putExtra("stdName",stdname);
+            intent.putExtra("stdClass",stdclass);
             startActivity(intent);
             finish();
         }
@@ -117,6 +132,7 @@ public class Login extends AppCompatActivity {
     private void CheckLogin(String usertype ,String username,String email,String password){
         FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         changeinProgress(true);
+/*
         firebaseAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
@@ -152,7 +168,8 @@ public class Login extends AppCompatActivity {
                     }
             }
         });
-    /*   Query emailquery = databaseReference.child(usertype).orderByChild("email").equalTo(email);
+*/
+       Query emailquery = databaseReference.child(usertype).orderByChild("name").equalTo(username);
         emailquery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -162,21 +179,37 @@ public class Login extends AppCompatActivity {
                         if(storedpass!=null && storedpass.equals(password)){
                             String userid = databaseReference.getKey();
                             Toast.makeText(Login.this, "Login successful", Toast.LENGTH_SHORT).show();
+                            changeinProgress(false);
                             // Proceed to next activity or whatever your login success action is
+                            UserSession userSession = new UserSession(getApplicationContext());
+                            userSession.saveUserName(username);
+                            userSession.saveUserEmail(email);
+                            userSession.saveUserType(usertype);
+                            userSession.saveUserPassword(password);
+                            SharedPreferences sharedPreferences =  getSharedPreferences(SHARED_PREFS,MODE_PRIVATE);
+                            SharedPreferences.Editor editor  = sharedPreferences.edit();
+                            editor.putString("name","true");
+                            editor.putString("username",username);
+                            editor.putString("email",email);
+                            editor.putString("usertype",usertype);
+                            editor.apply();
                             Intent intent = new Intent(Login.this, Facultyhome.class);
                             intent.putExtra("username",username);
                             intent.putExtra("email",email);
                             intent.putExtra("usertype",usertype);
+
                             startActivity(intent);
                             finish();
 
                             return;
                         } else {
                             Toast.makeText(Login.this, "Incorrect password", Toast.LENGTH_SHORT).show();
+                            changeinProgress(false);
                         }
                     }
                 } else {
                     Toast.makeText(Login.this, "User not found", Toast.LENGTH_SHORT).show();
+                    changeinProgress(false);
                 }
             }
 
@@ -184,7 +217,7 @@ public class Login extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
                 Toast.makeText(Login.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
-        });*/
+        });
 
 
 
@@ -204,5 +237,64 @@ public class Login extends AppCompatActivity {
     private boolean isValidEmail(CharSequence email) {
         return !TextUtils.isEmpty(email) && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
+
+    private void CheckParentLogin(String parent, String username, String email, String password) {
+        DatabaseReference parentRef = FirebaseDatabase.getInstance().getReference("Parent");
+        Query emailquery = parentRef.orderByChild("parentName").equalTo(username);
+        emailquery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    for(DataSnapshot passsnapshot : snapshot.getChildren()){
+                        String storedpass = passsnapshot.child("parentPassword").getValue(String.class);
+                        String stdname = passsnapshot.child("stdName").getValue(String.class);
+                        String stdclass = passsnapshot.child("stdClass").getValue(String.class);
+                        if(storedpass!=null && storedpass.equals(password)){
+                            String userid = parentRef.getKey();
+                            Toast.makeText(Login.this, "Login successful", Toast.LENGTH_SHORT).show();
+                            changeinProgress(false);
+                            // Proceed to next activity or whatever your login success action is
+                            UserSession userSession = new UserSession(getApplicationContext());
+                            userSession.saveUserName(username);
+                            userSession.saveUserEmail(email);
+                            userSession.saveUserType(parent);
+                            userSession.saveUserPassword(password);
+                            userSession.saveStdName(stdname);
+                            SharedPreferences sharedPreferences =  getSharedPreferences(SHARED_PREFS,MODE_PRIVATE);
+                            SharedPreferences.Editor editor  = sharedPreferences.edit();
+                            editor.putString("name","true");
+                            editor.putString("username",username);
+                            editor.putString("email",email);
+                            editor.putString("usertype",parent);
+                            editor.putString("stdName",stdname);
+                            editor.putString("stdClass",stdclass);
+                            editor.apply();
+                            Intent intent = new Intent(Login.this, Parent.class);
+                            intent.putExtra("username",username);
+                            intent.putExtra("email",email);
+                            intent.putExtra("usertype",parent);
+                            intent.putExtra("stdName",stdname);
+                            intent.putExtra("stdClass",stdclass);
+                            startActivity(intent);
+                            finish();
+
+                            return;
+                        } else {
+                            Toast.makeText(Login.this, "Incorrect password", Toast.LENGTH_SHORT).show();
+                            changeinProgress(false);
+                        }
+                    }
+                } else {
+                    Toast.makeText(Login.this, "User not found", Toast.LENGTH_SHORT).show();
+                    changeinProgress(false);
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(Login.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 }
 

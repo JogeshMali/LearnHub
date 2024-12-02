@@ -67,6 +67,7 @@ public class Facultyhome extends AppCompatActivity {
     TextView username,email;
     static  CircleImageView profileimg ;
     Boolean isFaculty;
+    String uname,usertype;
     public static final String SHARED_PREFS = "shared_prefs";
 
 
@@ -75,9 +76,9 @@ public class Facultyhome extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent= getIntent();
-        String uname = intent.getStringExtra("username");
+         uname = intent.getStringExtra("username");
         String emailid = intent.getStringExtra("email");
-        String usertype=intent.getStringExtra("usertype");
+         usertype=intent.getStringExtra("usertype");
         binding = ActivityFacultyhomeBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setSupportActionBar(binding.appBarFacultyhome.toolbar);
@@ -168,6 +169,7 @@ public class Facultyhome extends AppCompatActivity {
                             editor.putString("username","");
                             editor.putString("email","");
                             editor.putString("usertype","");
+                            editor.putString("password","");
                             editor.apply();
 
                             startActivity(new Intent(Facultyhome.this, Login.class));
@@ -257,7 +259,7 @@ public class Facultyhome extends AppCompatActivity {
     }
     private void uploadImageToFirebase(Uri imageUri,String emailid){
         if (imageUri!=null){
-            StorageReference imageref = storageReference.child("image/"+emailid.replace(".", ",") +".jpg");
+            StorageReference imageref = storageReference.child("image/"+usertype+"/"+emailid.replace(".", ",") +".jpg");
             imageref.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {

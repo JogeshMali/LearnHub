@@ -20,6 +20,9 @@ glide="4.15.1"
 firebaseAuth = "23.0.0"
 floating-action-menu="1.6.4"
 flexbox="3.0.0"
+sdp = "1.1.0"
+ssp = "1.1.0"
+
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -40,6 +43,8 @@ glide={group="com.github.bumptech.glide",name ="glide",version.ref="glide"}
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
 floating-action-menu = { group = "com.github.clans", name = "fab", version.ref = "floating-action-menu" }
 flexbox={group="com.google.android.flexbox",name="flexbox",version.ref="flexbox"}
+sdp = { group = "com.intuit.sdp", name = "sdp-android", version.ref = "sdp" }
+ssp = { group = "com.intuit.ssp", name = "ssp-android", version.ref = "ssp" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServices" }

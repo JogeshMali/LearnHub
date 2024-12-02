@@ -13,7 +13,7 @@ public class ChatMessage {
     public ChatMessage(String user, String message) {
         this.user = user;
         this.message = message;
-        this.messagetime = new Date().getTime();
+        this.messagetime = System.currentTimeMillis();
     }
 
     public String getUser() {
@@ -37,7 +37,7 @@ public class ChatMessage {
     }
     public String format(){
         Date date = new Date(messagetime);
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
         return formatter.format(date);
     }
 }

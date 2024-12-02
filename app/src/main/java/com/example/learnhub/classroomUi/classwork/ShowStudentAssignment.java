@@ -84,10 +84,10 @@ public class ShowStudentAssignment extends AppCompatActivity {
                     // Traverse each title
                     for (DataSnapshot titleSnapshot : classcodeSnapshot.getChildren()) {
                         // Check if the uid exists under this title
-                        if (titleSnapshot.hasChild(uid)) {
+                        if (titleSnapshot.hasChild(username)) {
                             uidFound = true; // Set flag since UID was found
 
-                            DataSnapshot fileMapSnapshot = titleSnapshot.child(uid).child("fileMap");
+                            DataSnapshot fileMapSnapshot = titleSnapshot.child(username).child("fileMap");
 
                             // Iterate through the fileMap and get file details
                             for (DataSnapshot fileSnapshot : fileMapSnapshot.getChildren()) {

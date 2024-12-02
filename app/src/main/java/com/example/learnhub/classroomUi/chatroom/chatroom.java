@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,6 +22,7 @@ import com.example.learnhub.ChatMessage;
 import com.example.learnhub.R;
 import com.example.learnhub.adapter.RecyclerViewAdapter;
 import com.example.learnhub.adapter.RecyclerViewAdapterChat;
+import com.example.learnhub.model.UserSession;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -45,11 +47,13 @@ public class chatroom extends Fragment {
     EditText msgbox;
     Button sendmessage;
     DatabaseReference chatref;
+    ConstraintLayout constraintLayout;
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private String mParam1;
     private String mParam2;
     String classcode;
+    int classbg ;
 
     public chatroom() {
         // Required empty public constructor
@@ -84,43 +88,43 @@ public class chatroom extends Fragment {
         View view  =  inflater.inflate(R.layout.fragment_chatroom, container, false);
         Intent intent = getActivity().getIntent();
         String classname = intent.getStringExtra("classname");
-        String section = intent.getStringExtra("section");
         String subject = intent.getStringExtra("subject");
         classcode = intent.getStringExtra("classcode");
+        classbg = intent.getIntExtra("classimg",0);
+
 
         cname = view.findViewById(R.id.classname);
-        csection= view.findViewById(R.id.section);
         csubject= view.findViewById(R.id.subject);
         sendmessage = view.findViewById(R.id.sendmsg);
         msgbox = view.findViewById(R.id.msgBox);
-
+       constraintLayout = view.findViewById(R.id.classbgimg);
         chatref  = FirebaseDatabase.getInstance().getReference("ChatMessage");
         recyclerViewChat = view.findViewById(R.id.recyclerviewchat);
         chatMessageArrayList = new ArrayList<>();
         recyclerViewChat.setHasFixedSize(true);
-        recyclerViewChat.setLayoutManager(new LinearLayoutManager(getActivity()));
-        chatAdapter = new RecyclerViewAdapterChat(getActivity(),chatMessageArrayList);
+        recyclerViewChat.setLayoutManager(new LinearLayoutManager(getContext()));
+        chatAdapter = new RecyclerViewAdapterChat(getContext(),chatMessageArrayList);
         recyclerViewChat.setAdapter(chatAdapter);
         addChatInList();
         cname.setText(classname);
-        csection.setText(section);
+        constraintLayout.setBackgroundResource(classbg);
         csubject.setText(subject);
 
         sendmessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String msg = msgbox.getText().toString();
-                FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-                String user = firebaseAuth.getCurrentUser().getDisplayName();
+                UserSession userSession = new UserSession(getContext());
+                String user = userSession.getUserName();
                 ChatMessage chatMessage = new ChatMessage(user,msg);
-                chatref.child(classcode).child(user).push().setValue(chatMessage).addOnCompleteListener(new OnCompleteListener<Void>() {
+                chatref.child(classcode).push().setValue(chatMessage).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if(!msg.isEmpty() && !user.isEmpty()) {
                             msgbox.setText("");
-                            chatMessageArrayList.add(chatMessage);
+                            /*chatMessageArrayList.add(chatMessage);
                             chatAdapter.notifyItemInserted(chatMessageArrayList.size() - 1);
-                            recyclerViewChat.scrollToPosition(chatMessageArrayList.size() - 1);
+                            recyclerViewChat.scrollToPosition(chatMessageArrayList.size() - 1);*/
                             Toast.makeText(getActivity(), "message is send", Toast.LENGTH_SHORT).show();
                         }else {
                             Toast.makeText(getActivity(), "message is not send", Toast.LENGTH_SHORT).show();
@@ -133,17 +137,17 @@ public class chatroom extends Fragment {
 
     }
     private void addChatInList() {
-        chatref.child(classcode).addChildEventListener(new ChildEventListener() {
+        UserSession userSession = new UserSession(getContext());
+        String user = userSession.getUserName();
+        Query query = chatref.child(classcode).orderByChild("messagetime"); // Order by timestamp
+        query.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-                    for (DataSnapshot messageSnapshot : snapshot.getChildren()) {
-                        ChatMessage chatMessage = messageSnapshot.getValue(ChatMessage.class);
-                        if (chatMessage != null) {
-                            chatMessageArrayList.add(chatMessage);
-                            chatAdapter.notifyItemInserted(chatMessageArrayList.size() - 1);
-                            recyclerViewChat.scrollToPosition(chatMessageArrayList.size() - 1);
-                        }
+                    ChatMessage chatMessage = snapshot.getValue(ChatMessage.class);
+                    if (chatMessage != null) {
+                        chatMessageArrayList.add(chatMessage);
+                        chatAdapter.notifyItemInserted(chatMessageArrayList.size() - 1);
+                        recyclerViewChat.scrollToPosition(chatMessageArrayList.size() - 1);
                     }
 
             }
@@ -168,8 +172,6 @@ public class chatroom extends Fragment {
                 Toast.makeText(getActivity(), "Failed to load messages: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-
-
     }
 
 }

@@ -2,7 +2,10 @@ package com.example.learnhub.classroomUi.classwork;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,6 +16,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -20,6 +24,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.learnhub.R;
 import com.example.learnhub.model.AttendanceModel;
 import com.example.learnhub.model.NotificationModel;
+import com.example.learnhub.model.UserSession;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -34,6 +39,7 @@ public class CreateAttendance extends AppCompatActivity {
     ImageButton datebtn;
     Button createAttendancebtn;
     String classcode,date;
+    Toolbar toolbar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +50,15 @@ public class CreateAttendance extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        toolbar = findViewById(R.id.attendance_Toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            Drawable upArrow = getResources().getDrawable(R.drawable.backbtn); // Default back icon for AppCompat
+            upArrow.setColorFilter(getResources().getColor(android.R.color.white), PorterDuff.Mode.SRC_ATOP);
+            getSupportActionBar().setHomeAsUpIndicator(upArrow);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
         Intent intent  = getIntent();
         classcode = intent.getStringExtra("classcode");
         attenTitle = findViewById(R.id.attendanceTitle);
@@ -56,6 +71,14 @@ public class CreateAttendance extends AppCompatActivity {
         datebtn.setOnClickListener(v -> showDatePicker());
         createAttendancebtn.setOnClickListener(v -> createAttendance());
 
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 
@@ -101,7 +124,8 @@ public class CreateAttendance extends AppCompatActivity {
             databaseReference.child(attendanceId).setValue(attendanceModel)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            String username = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+                            UserSession userSession = new UserSession(getApplicationContext());
+                            String username = userSession.getUserName();
                             NotificationModel.NotificationUtils.sendNotification(getApplicationContext(),title,"Uploaded the Attendance",username,classcode);
                             Toast.makeText(CreateAttendance.this, "Attendance created successfully", Toast.LENGTH_SHORT).show();
                             ChangeProgress(false);

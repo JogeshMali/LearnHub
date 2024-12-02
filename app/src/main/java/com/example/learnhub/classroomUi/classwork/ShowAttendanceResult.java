@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.learnhub.R;
 import com.example.learnhub.adapter.RecyclerViewAdapterQuizResult;
 import com.example.learnhub.model.AttendanceModel;
+import com.example.learnhub.model.UserSession;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -57,6 +58,36 @@ public class ShowAttendanceResult extends AppCompatActivity {
     }
 
     private void fetchAttendResult() {
+        UserSession userSession  =new UserSession(getApplicationContext());
+        String usertype  =userSession.getUserType();
+        String stdname = userSession.getStdName();
+        if (usertype.equals("Parent")){
+            DatabaseReference attendRef = FirebaseDatabase.getInstance().getReference("StudentAttendance");
+            attendRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    for (DataSnapshot classcode : snapshot.getChildren()) {
+                        for (DataSnapshot titleSnaphot : classcode.getChildren()) {
+                            String dbTitle = titleSnaphot.getKey();
+                            if (dbTitle.equals(title)) {
+                                for (DataSnapshot uidSnapshot : titleSnaphot.getChildren()) {
+                                    String username = uidSnapshot.child("stdName").getValue(String.class);
+                                    if (username.equals(stdname)) {
+                                        boolean isPresent = uidSnapshot.child("present").getValue(Boolean.class);
+                                        attendResultList.add(new AttendanceModel.StudentAttendance(username, isPresent));
+                                    }
+                                }
+                                attendAdapter.updateData(attendResultList);
+                            }
+                        }
+                    }
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        }else {
         DatabaseReference attendRef = FirebaseDatabase.getInstance().getReference("StudentAttendance")
                 .child(classcode).child(title);
         attendRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -76,5 +107,6 @@ public class ShowAttendanceResult extends AppCompatActivity {
             }
         });
 
+     }
     }
 }

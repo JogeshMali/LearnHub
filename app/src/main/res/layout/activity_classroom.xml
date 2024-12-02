@@ -9,8 +9,8 @@
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar3"
-        android:layout_width="396dp"
-        android:layout_height="69dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
@@ -23,10 +23,10 @@
 
     <FrameLayout
         android:id="@+id/fragment_container"
-        android:layout_width="398dp"
+        android:layout_width="@dimen/_302sdp"
         android:layout_height="645dp"
         android:layout_above="@id/classroombottom"
-        android:layout_marginTop="2dp"
+        android:layout_marginTop="@dimen/_2sdp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -36,7 +36,7 @@
         android:id="@+id/classroombottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
+        android:layout_marginTop="@dimen/_1sdp"
         android:layout_marginEnd="0dp"
         android:layout_marginStart="0dp"
         app:layout_constraintBottom_toBottomOf="parent"

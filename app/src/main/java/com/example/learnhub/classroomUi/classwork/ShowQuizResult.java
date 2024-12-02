@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.learnhub.R;
 import com.example.learnhub.adapter.RecyclerViewAdapterQuizResult;
 import com.example.learnhub.model.QuizResultModel;
+import com.example.learnhub.model.UserSession;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -58,23 +59,67 @@ public class ShowQuizResult extends AppCompatActivity {
     }
 
     private void fetchQuizResult() {
-        DatabaseReference quizRef = FirebaseDatabase.getInstance().getReference("QuizUser")
-                .child("classroom")
-                .child(classcode)
-                .child(title);
+        UserSession userSession  =new UserSession(getApplicationContext());
+        String usertype  =userSession.getUserType();
+        String stdname  =userSession.getStdName();
+        if (usertype.equals("Parent")){
+            DatabaseReference quizRef = FirebaseDatabase.getInstance().getReference("QuizUser")
+                    .child("classroom");
+            quizRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    quizResultList.clear(); // Clear existing results
+                    for (DataSnapshot classcode :snapshot.getChildren()) {
+                        for (DataSnapshot titleSnaphot : classcode.getChildren()) {
+                            String dbTitle = titleSnaphot.getKey();
+                            if (dbTitle.equals(title)) {
+                                for (DataSnapshot usernameSnapshot : titleSnaphot.getChildren()) {
+                                    String username = usernameSnapshot.getKey(); // Get username
+                                    Log.d("fetchQuizResult", "Username: " + username);
+                                    if (username.equals(stdname)) {
+                                        // Access the "Score" node under each username
+                                        DataSnapshot scoreSnapshot = usernameSnapshot.child("Score");
+                                        if (scoreSnapshot.exists()) {
+                                            // Retrieve score value from "Score" node
+                                            float score = scoreSnapshot.child("score").getValue(Float.class);
+                                            Log.d("fetchQuizResult", "Score for " + username + ": " + score);
 
-        quizRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                quizResultList.clear(); // Clear existing results
+                                            // Add the username and score to the result list
+                                            quizResultList.add(new QuizResultModel(username, String.valueOf(score)));
+                                        } else {
+                                            Log.d("fetchQuizResult", "Score not found for username: " + username);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
 
-                // Loop through each userID under the class
-                for (DataSnapshot userIdSnapshot : snapshot.getChildren()) {
-                    String userId = userIdSnapshot.getKey(); // Get userID
-                    Log.d("fetchQuizResult", "UserID: " + userId);
+
+                    // Update the adapter with the new data
+                    quizResultAdapter.updateData(quizResultList);
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Log.e("fetchQuizResult", "Error retrieving data: " + error.getMessage());
+                }
+            });
+        }else {
+            DatabaseReference quizRef = FirebaseDatabase.getInstance().getReference("QuizUser")
+                    .child("classroom")
+                    .child(classcode)
+                    .child(title);
+
+            quizRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    quizResultList.clear(); // Clear existing results
+
+                    // Loop through each userID under the class
 
                     // Loop through each username under the userID
-                    for (DataSnapshot usernameSnapshot : userIdSnapshot.getChildren()) {
+                    for (DataSnapshot usernameSnapshot : snapshot.getChildren()) {
                         String username = usernameSnapshot.getKey(); // Get username
                         Log.d("fetchQuizResult", "Username: " + username);
 
@@ -86,23 +131,25 @@ public class ShowQuizResult extends AppCompatActivity {
                             Log.d("fetchQuizResult", "Score for " + username + ": " + score);
 
                             // Add the username and score to the result list
-                            quizResultList.add(new QuizResultModel(username,  String.valueOf(score)));
+                            quizResultList.add(new QuizResultModel(username, String.valueOf(score)));
                         } else {
                             Log.d("fetchQuizResult", "Score not found for username: " + username);
                         }
                     }
+
+
+                    // Update the adapter with the new data
+                    quizResultAdapter.updateData(quizResultList);
                 }
 
-                // Update the adapter with the new data
-                quizResultAdapter.updateData(quizResultList);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.e("fetchQuizResult", "Error retrieving data: " + error.getMessage());
-            }
-        });
-    }    }
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Log.e("fetchQuizResult", "Error retrieving data: " + error.getMessage());
+                }
+            });
+        }
+    }
+}
 
 
 

@@ -16,6 +16,9 @@
         android:theme="@style/Theme.LearnHub"
         tools:targetApi="31">
         <activity
+            android:name=".Parent"
+            android:exported="false" />
+        <activity
             android:name=".adapterLayout.ShowNotification"
             android:exported="false" />
         <activity

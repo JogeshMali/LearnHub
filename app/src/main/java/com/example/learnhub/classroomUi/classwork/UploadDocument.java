@@ -173,7 +173,7 @@ public class UploadDocument extends AppCompatActivity {
        List<String> documentUrlList = new ArrayList<>();
        for (Uri documentUri : documentList) {
            String filename = getFileName(documentUri);
-           StorageReference fileref = storageref.child(classcode + "/"+ntopic +"/" + filename);
+           StorageReference fileref = storageref.child("Notes"+"/"+classcode + "/"+ntopic +"/" + filename);
            fileref.putFile(documentUri).addOnCompleteListener(task -> {
                fileref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                    @Override
